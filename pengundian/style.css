@@ -1,6 +1,6 @@
 /* ==================================================
    PENGUNDIAN PAGE – style.css
-   Premium lottery visualization with 3D effects
+   Premium lottery visualization – Light Theme
 ================================================== */
 
 /* ============= RESET & BASE ============= */
@@ -16,8 +16,8 @@ html {
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1f4e 30%, #0d1234 60%, #0a0e27 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 30%, #f1f5f9 60%, #f8fafc 100%);
+    color: #1e293b;
     overflow-x: hidden;
     min-height: 100vh;
 }
@@ -46,12 +46,15 @@ body {
         transform: translateY(100vh) rotate(0deg);
         opacity: 0;
     }
+
     10% {
-        opacity: 0.6;
+        opacity: 0.5;
     }
+
     90% {
-        opacity: 0.6;
+        opacity: 0.5;
     }
+
     100% {
         transform: translateY(-100px) rotate(720deg);
         opacity: 0;
@@ -66,7 +69,7 @@ body {
     transform: translate(-50%, -50%);
     width: 800px;
     height: 600px;
-    opacity: 0.12;
+    opacity: 0.08;
     z-index: 0;
     pointer-events: none;
 }
@@ -97,20 +100,34 @@ body {
 }
 
 @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .lottery-logo {
     height: 60px;
     margin-bottom: 16px;
-    filter: drop-shadow(0 0 20px rgba(29, 78, 216, 0.5));
+    filter: drop-shadow(0 4px 12px rgba(29, 78, 216, 0.25));
     animation: pulse 3s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 .lottery-title {
@@ -122,42 +139,56 @@ body {
 .title-line1 {
     font-size: 2.8rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6, #fbbf24);
+    background: linear-gradient(135deg, #1d4ed8, #7c3aed, #db2777, #d97706);
     background-size: 300% 300%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: gradientShift 4s ease infinite;
-    text-shadow: none;
     letter-spacing: 2px;
 }
 
 @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .title-line2 {
     font-size: 1.6rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
+    color: #334155;
     letter-spacing: 6px;
     text-transform: uppercase;
 }
 
 .lottery-subtitle {
     font-size: 1.1rem;
-    color: #fbbf24;
+    color: #b45309;
     margin-top: 12px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 1px;
     animation: pulseGlow 2s ease-in-out infinite;
 }
 
 @keyframes pulseGlow {
-    0%, 100% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
-    50% { text-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+
+    0%,
+    100% {
+        text-shadow: 0 0 8px rgba(180, 83, 9, 0.2);
+    }
+
+    50% {
+        text-shadow: 0 0 20px rgba(180, 83, 9, 0.5);
+    }
 }
 
 /* ============= SLOT MACHINE ============= */
@@ -168,46 +199,54 @@ body {
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .slot-box {
     display: flex;
     gap: 12px;
     padding: 24px 32px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid rgba(29, 78, 216, 0.15);
     border-radius: 20px;
     backdrop-filter: blur(20px);
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1),
-        0 0 80px rgba(99, 102, 241, 0.15);
+        0 20px 60px rgba(0, 0, 0, 0.08),
+        0 0 80px rgba(99, 102, 241, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .slot-reel {
     width: 100px;
     height: 130px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, #ffffff 50%, rgba(255,255,255,0.95) 100%);
+    background: linear-gradient(180deg, #eef2ff 0%, #ffffff 50%, #eef2ff 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
+    border: 2px solid rgba(99, 102, 241, 0.2);
     box-shadow:
-        inset 0 4px 8px rgba(0,0,0,0.1),
-        0 4px 16px rgba(0,0,0,0.2);
+        inset 0 4px 8px rgba(99, 102, 241, 0.06),
+        0 4px 16px rgba(0, 0, 0, 0.06);
     transition: transform 0.1s ease;
 }
 
 .slot-reel span {
     font-size: 4rem;
     font-weight: 900;
-    color: #1a1f4e;
+    color: #1e3a8a;
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-shadow: 0 2px 4px rgba(30, 58, 138, 0.1);
 }
 
 .slot-reel.spinning span {
@@ -215,19 +254,33 @@ body {
 }
 
 @keyframes reelSpin {
-    0% { transform: translateY(-100%); opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { transform: translateY(100%); opacity: 0; }
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
 }
 
 .slot-reel.revealed {
     background: linear-gradient(180deg, #fef3c7, #fde68a, #fef3c7);
+    border-color: #f59e0b;
     transform: scale(1.05);
     box-shadow:
-        inset 0 4px 8px rgba(0,0,0,0.05),
-        0 4px 20px rgba(251, 191, 36, 0.4),
-        0 0 40px rgba(251, 191, 36, 0.2);
+        inset 0 4px 8px rgba(0, 0, 0, 0.05),
+        0 4px 20px rgba(245, 158, 11, 0.3),
+        0 0 40px rgba(245, 158, 11, 0.15);
 }
 
 .slot-reel.revealed span {
@@ -241,7 +294,7 @@ body {
     transform: translate(-50%, -50%);
     width: 120%;
     height: 120%;
-    background: radial-gradient(ellipse, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s ease;
@@ -253,8 +306,15 @@ body {
 }
 
 @keyframes glowPulse {
-    0%, 100% { transform: translate(-50%,-50%) scale(1); }
-    50% { transform: translate(-50%,-50%) scale(1.1); }
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
 }
 
 /* ============= START BUTTON ============= */
@@ -267,7 +327,7 @@ body {
     font-size: 1.4rem;
     font-weight: 800;
     color: #ffffff;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    background: linear-gradient(135deg, #1d4ed8, #6366f1, #7c3aed);
     border: none;
     border-radius: 16px;
     cursor: pointer;
@@ -275,8 +335,8 @@ body {
     text-transform: uppercase;
     transition: all 0.3s ease;
     box-shadow:
-        0 8px 32px rgba(99, 102, 241, 0.5),
-        0 0 60px rgba(139, 92, 246, 0.3);
+        0 8px 32px rgba(29, 78, 216, 0.35),
+        0 0 60px rgba(99, 102, 241, 0.15);
     animation: fadeInUp 1s ease 0.6s both, btnPulse 2s ease-in-out infinite 1.6s;
     position: relative;
     overflow: hidden;
@@ -289,24 +349,36 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
     transform: rotate(45deg);
     animation: shimmer 3s ease-in-out infinite;
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
 }
 
 @keyframes btnPulse {
-    0%, 100% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.5), 0 0 60px rgba(139, 92, 246, 0.3); }
-    50% { box-shadow: 0 8px 48px rgba(99, 102, 241, 0.7), 0 0 100px rgba(139, 92, 246, 0.5); }
+
+    0%,
+    100% {
+        box-shadow: 0 8px 32px rgba(29, 78, 216, 0.35), 0 0 60px rgba(99, 102, 241, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 8px 48px rgba(29, 78, 216, 0.5), 0 0 100px rgba(99, 102, 241, 0.3);
+    }
 }
 
 .btn-start:hover {
     transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 12px 48px rgba(99, 102, 241, 0.7), 0 0 100px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 12px 48px rgba(29, 78, 216, 0.5), 0 0 100px rgba(99, 102, 241, 0.3);
 }
 
 .btn-start:active {
@@ -321,14 +393,14 @@ body {
 
 .btn-start:disabled:hover {
     transform: none;
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.35);
 }
 
 /* ============= STATUS TEXT ============= */
 .status-text {
     margin-top: 24px;
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: #64748b;
     letter-spacing: 1px;
     animation: fadeInUp 1s ease 0.9s both;
 }
@@ -342,7 +414,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 60px 20px;
-    background: linear-gradient(180deg, #0a0e27 0%, #1e1b4b 50%, #0a0e27 100%);
+    background: linear-gradient(180deg, #f1f5f9 0%, #e0e7ff 50%, #f1f5f9 100%);
 }
 
 #confettiCanvas {
@@ -366,20 +438,27 @@ body {
 .winner-title {
     font-size: 2.2rem;
     font-weight: 800;
-    color: #fbbf24;
+    color: #b45309;
     margin-bottom: 30px;
-    text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+    text-shadow: 0 2px 8px rgba(180, 83, 9, 0.15);
     animation: fadeInDown 0.8s ease;
 }
 
 .winner-title i {
-    color: #fbbf24;
+    color: #d97706;
     animation: trophySpin 2s ease-in-out infinite;
 }
 
 @keyframes trophySpin {
-    0%, 100% { transform: rotate(-10deg) scale(1); }
-    50% { transform: rotate(10deg) scale(1.1); }
+
+    0%,
+    100% {
+        transform: rotate(-10deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(10deg) scale(1.1);
+    }
 }
 
 /* Winner Slot Box */
@@ -395,10 +474,11 @@ body {
     width: 80px;
     height: 100px;
     background: linear-gradient(180deg, #fef3c7, #fde68a, #fef3c7);
+    border: 2px solid #f59e0b;
     border-radius: 10px;
     box-shadow:
-        0 4px 20px rgba(251, 191, 36, 0.4),
-        0 0 40px rgba(251, 191, 36, 0.2);
+        0 4px 20px rgba(245, 158, 11, 0.25),
+        0 0 40px rgba(245, 158, 11, 0.1);
 }
 
 .winner-slot-box .slot-reel span {
@@ -409,12 +489,13 @@ body {
 
 /* Winner Info */
 .winner-info {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(29, 78, 216, 0.12);
     border-radius: 16px;
     padding: 28px 32px;
     backdrop-filter: blur(20px);
     margin-bottom: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
     animation: fadeInUp 0.8s ease 0.4s both;
 }
 
@@ -423,7 +504,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .winner-detail:last-child {
@@ -432,14 +513,14 @@ body {
 
 .winner-label {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: #64748b;
     font-weight: 500;
 }
 
 .winner-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #1e293b;
     letter-spacing: 0.5px;
 }
 
@@ -451,7 +532,8 @@ body {
     animation: fadeInUp 0.8s ease 0.6s both;
 }
 
-.btn-valid, .btn-selesai {
+.btn-valid,
+.btn-selesai {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -470,23 +552,23 @@ body {
 .btn-valid {
     color: #ffffff;
     background: linear-gradient(135deg, #22c55e, #16a34a);
-    box-shadow: 0 6px 24px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 6px 24px rgba(34, 197, 94, 0.3);
 }
 
 .btn-valid:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.6);
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.5);
 }
 
 .btn-selesai {
     color: #ffffff;
     background: linear-gradient(135deg, #6b7280, #4b5563);
-    box-shadow: 0 6px 24px rgba(107, 114, 128, 0.4);
+    box-shadow: 0 6px 24px rgba(107, 114, 128, 0.3);
 }
 
 .btn-selesai:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(107, 114, 128, 0.6);
+    box-shadow: 0 8px 32px rgba(107, 114, 128, 0.5);
 }
 
 /* ============= RESPONSIVE ============= */

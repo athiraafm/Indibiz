@@ -26,7 +26,7 @@ let spinIntervals = [];
 ============================================================ */
 function createParticles() {
     const container = document.getElementById('particles');
-    const colors = ['#6366f1', '#8b5cf6', '#a855f7', '#fbbf24', '#60a5fa', '#f472b6'];
+    const colors = ['#1d4ed8', '#7c3aed', '#db2777', '#d97706', '#0891b2', '#059669'];
 
     for (let i = 0; i < 50; i++) {
         const particle = document.createElement('div');
@@ -135,7 +135,7 @@ function startLottery() {
 function showWinner(winner) {
     const statusText = document.getElementById('statusText');
     statusText.textContent = '🎉 Pemenang telah terpilih! 🎉';
-    statusText.style.color = '#fbbf24';
+    statusText.style.color = '#b45309';
     statusText.style.fontSize = '1.2rem';
     statusText.style.fontWeight = '700';
 
@@ -266,7 +266,7 @@ function finishLottery() {
 
         const statusText = document.getElementById('statusText');
         statusText.textContent = 'Tekan START untuk memulai pengundian';
-        statusText.style.color = 'rgba(255, 255, 255, 0.6)';
+        statusText.style.color = '#64748b';
         statusText.style.fontSize = '0.95rem';
         statusText.style.fontWeight = '400';
 
