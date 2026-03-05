@@ -1,0 +1,9 @@
+nama,no_internet,kota,paket,bulan,tagihan,tanggal_bayar,status_bayar
+CV. Mitra Abadi,1112223344,Banjarmasin,IndiBiz High Speed 100Mbps,April 2025,400000,5,Lunas
+CV. Mitra Abadi,1112223344,Banjarmasin,IndiBiz High Speed 100Mbps,Mei 2025,400000,12,Lunas
+CV. Mitra Abadi,1112223344,Banjarmasin,IndiBiz High Speed 100Mbps,Juni 2025,400000,18,Lunas
+PT. Usaha Bersama,2223334455,Balikpapan,IndiBiz Basic 50Mbps,April 2025,300000,3,Lunas
+PT. Usaha Bersama,2223334455,Balikpapan,IndiBiz Basic 50Mbps,Mei 2025,300000,14,Lunas
+PT. Usaha Bersama,2223334455,Balikpapan,IndiBiz Basic 50Mbps,Juni 2025,300000,0,Belum
+UD. Sejahtera Jaya,3334445566,Pontianak,IndiBiz Pro 200Mbps,April 2025,500000,7,Lunas
+UD. Sejahtera Jaya,3334445566,Pontianak,IndiBiz Pro 200Mbps,Mei 2025,500000,10,Lunas

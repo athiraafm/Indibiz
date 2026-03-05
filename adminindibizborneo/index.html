@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Login – IndiBiz Borneo</title>
+    <link rel="stylesheet" href="admin-style.css?v=3">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="../logo.png" alt="IndiBiz Logo">
+            </div>
+            <h2 class="login-title">Admin Dashboard</h2>
+            <p class="login-subtitle">Program Undian IndiBiz Borneo</p>
+
+            <div class="login-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="loginErrorText">Username atau password salah.</span>
+            </div>
+
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrap">
+                        <input type="text" id="username" placeholder="Masukkan username" autofocus>
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" placeholder="Masukkan password">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>&nbsp; Masuk
+                </button>
+            </form>
+
+            <div class="login-footer">
+                &copy; 2025 IndiBiz – PT. Telkom Indonesia (Persero) Tbk.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if already logged in
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            window.location.href = 'dashboard.html';
+        }
+
+        const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+
+            if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+
+                // Log login activity
+                const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
+                logs.unshift({
+                    time: new Date().toLocaleString('id-ID'),
+                    type: 'login',
+                    action: 'Login Admin',
+                    detail: 'Admin berhasil login ke dashboard.'
+                });
+                localStorage.setItem('adminLogs', JSON.stringify(logs));
+
+                window.location.href = 'dashboard.html';
+            } else {
+                const err = document.getElementById('loginError');
+                err.classList.add('show');
+                document.getElementById('loginErrorText').textContent = 'Username atau password salah. Silakan coba lagi.';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        });
+    </script>
+</body>
+
+</html>

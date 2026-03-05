@@ -62,13 +62,18 @@ const TOP_CUSTOMERS_DATA = [
     { rank: 10, name: "PT. M*** A***", no: "8899001122", city: "Tenggarong", points: 4520, status: "active" },
 ];
 
-/* ============================================================
-   HELPERS
-============================================================ */
-function calcPoin(tagihan, bayar) {
+function getMultiplier(tanggalBayar) {
+    if (!tanggalBayar || tanggalBayar <= 0) return 0;
+    if (tanggalBayar >= 1 && tanggalBayar <= 10) return 3;
+    if (tanggalBayar >= 11 && tanggalBayar <= 15) return 2;
+    if (tanggalBayar >= 16 && tanggalBayar <= 20) return 1;
+    return 0;
+}
+
+function calcPoin(tagihan, bayar, tanggalBayar) {
     if (!bayar) return 0;
-    // 1 poin per 10.000 rupiah tagihan
-    return Math.floor(tagihan / 10000);
+    const base = Math.floor(tagihan / 100000);
+    return base * getMultiplier(tanggalBayar || 0);
 }
 
 function formatRp(num) {
@@ -134,7 +139,7 @@ function goToSlide(idx) {
     const containerWidth = sliderContainer.clientWidth;
     const slideWidth = slide.clientWidth;
     const slideOffset = slide.offsetLeft;
-    
+
     const scrollToX = slideOffset - (containerWidth / 2) + (slideWidth / 2);
 
     sliderContainer.scrollTo({
@@ -303,7 +308,19 @@ function spawnParticles() {
 function populateRanking() {
     const body = document.getElementById('rankingBody');
     if (!body) return;
-    body.innerHTML = TOP_CUSTOMERS_DATA.map(c => {
+
+    // Use published data from admin if available, else fallback to mock
+    const published = localStorage.getItem('publishedRanking');
+    const data = published ? JSON.parse(published).map((c, idx) => ({
+        rank: idx + 1,
+        name: c.censoredName || c.name,
+        no: c.no,
+        city: c.city,
+        points: c.poin,
+        status: idx < 3 ? 'top' : 'active'
+    })) : TOP_CUSTOMERS_DATA;
+
+    body.innerHTML = data.map(c => {
         let rankClass = 'rank-normal';
         if (c.rank === 1) rankClass = 'rank-gold';
         else if (c.rank === 2) rankClass = 'rank-silver';
@@ -352,7 +369,12 @@ function doCekPoin() {
 
     setTimeout(() => {
         loadingOverlay.classList.remove('active');
-        const customer = CUSTOMERS[no];
+
+        // Use published customer data if available, else fallback to mock
+        const publishedStr = localStorage.getItem('publishedCustomers');
+        const customerDB = publishedStr ? JSON.parse(publishedStr) : CUSTOMERS;
+        const customer = customerDB[no];
+
         if (!customer) {
             emptyState.style.display = 'block';
             document.getElementById('emptyMessage').textContent =
@@ -381,7 +403,7 @@ function showResult(no, cust) {
     const poinPerBulan = [];
 
     months.forEach(([bulan, data]) => {
-        const poin = calcPoin(data.tagihan, data.bayar);
+        const poin = calcPoin(data.tagihan, data.bayar, data.tanggalBayar || 0);
         totalPoin += poin;
         poinPerBulan.push({ bulan, poin });
 

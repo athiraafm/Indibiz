@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Dashboard Admin – IndiBiz Borneo</title>
+    <link rel="stylesheet" href="admin-style.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- SheetJS for Excel import/export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="../logo.png" alt="IndiBiz Logo">
+                <span>Admin Panel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Menu Utama</div>
+                <a href="#" class="active" data-section="overview">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="#" data-section="pelanggan">
+                    <i class="fas fa-users"></i> Data Pelanggan
+                </a>
+                <a href="#" data-section="top-customer">
+                    <i class="fas fa-trophy"></i> Top Customer
+                </a>
+                <a href="#" data-section="laporan">
+                    <i class="fas fa-file-export"></i> Laporan & Export
+                </a>
+                <div class="nav-section-title">Sistem</div>
+                <a href="#" data-section="pengaturan">
+                    <i class="fas fa-cog"></i> Pengaturan
+                </a>
+                <a href="#" data-section="log">
+                    <i class="fas fa-history"></i> Log Aktivitas
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Sidebar overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <div class="main-content">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-admin" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Overview</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="admin-clock" id="adminClock">
+                        <i class="fas fa-clock"></i>
+                        <span id="clockText">--:--:--</span>
+                        <span id="dateText" style="margin-left: 8px; opacity: 0.7;">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- ===================== SECTION: OVERVIEW ===================== -->
+                <div class="page-section active" id="sec-overview">
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card blue">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-label">Total Pelanggan</div>
+                            <div class="stat-value" id="statCustomers">0</div>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                            <div class="stat-label">Total Poin Beredar</div>
+                            <div class="stat-value" id="statPoints">0</div>
+                        </div>
+                        <div class="stat-card yellow">
+                            <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <div class="stat-label">Total Kupon</div>
+                            <div class="stat-value" id="statCoupons">0</div>
+                        </div>
+                        <div class="stat-card cyan">
+                            <div class="stat-icon"><i class="fas fa-search"></i></div>
+                            <div class="stat-label">Aktivitas Cek Poin</div>
+                            <div class="stat-value" id="statSearches">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="chart-row">
+                        <div class="mini-chart">
+                            <h4><i class="fas fa-chart-bar"></i> Poin Per Kota</h4>
+                            <div class="bar-chart" id="chartCity"></div>
+                        </div>
+                        <div class="mini-chart">
+                            <h4><i class="fas fa-chart-line"></i> Distribusi Kupon</h4>
+                            <div class="bar-chart" id="chartCoupon"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: DATA PELANGGAN ===================== -->
+                <div class="page-section" id="sec-pelanggan">
+                    <!-- Import Panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-file-upload"></i> Import Data Tagihan</h3>
+                            <button class="btn btn-outline btn-sm" onclick="showTemplateInfo()">
+                                <i class="fas fa-info-circle"></i> Format Template
+                            </button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="upload-zone" id="uploadZone">
+                                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag & drop file Excel di sini, atau <strong>klik untuk memilih file</strong></p>
+                                <small>Format: .xlsx, .xls, .csv &mdash; Kolom: Nama, No Internet, Kota, Paket, Bulan,
+                                    Tagihan, Tanggal Bayar, Status Bayar</small>
+                            </div>
+                            <!-- Import Preview -->
+                            <div id="importPreview" style="display:none; margin-top: 20px;">
+                                <div class="preview-stats" id="previewStats"></div>
+                                <div class="table-responsive">
+                                    <table class="admin-table" id="previewTable">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Nama</th>
+                                                <th>No Internet</th>
+                                                <th>Kota</th>
+                                                <th>Paket</th>
+                                                <th>Bulan</th>
+                                                <th>Tagihan</th>
+                                                <th>Tgl Bayar</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="previewBody"></tbody>
+                                    </table>
+                                </div>
+                                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                                    <button class="btn btn-primary" onclick="confirmImport()">
+                                        <i class="fas fa-check"></i> Konfirmasi Import
+                                    </button>
+                                    <button class="btn btn-outline" onclick="cancelImport()">
+                                        <i class="fas fa-times"></i> Batal
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Data Table -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-database"></i> Database Pelanggan</h3>
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="customerSearch" placeholder="Cari nama, no internet, kota...">
+                            </div>
+                        </div>
+                        <div class="panel-body no-pad">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Customer</th>
+                                            <th>No Internet</th>
+                                            <th>Kota</th>
+                                            <th>Paket</th>
+                                            <th>Total Poin</th>
+                                            <th>Kupon</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerTableBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: TOP CUSTOMER ===================== -->
+                <div class="page-section" id="sec-top-customer">
+                    <!-- Publish Status -->
+                    <div class="publish-status unpublished" id="publishStatus">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="publishStatusText">Data belum dipublish ke halaman pelanggan.</span>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-trophy"></i> Ranking Pelanggan</h3>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="publishRanking()">
+                                    <i class="fas fa-globe"></i> Publish ke Website
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body no-pad">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Nama Asli</th>
+                                            <th>Nama Sensor (Publik)</th>
+                                            <th>No Internet</th>
+                                            <th>Kota</th>
+                                            <th>Total Poin</th>
+                                            <th>Kupon</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rankingTableBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: LAPORAN ===================== -->
+                <div class="page-section" id="sec-laporan">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-file-export"></i> Export Laporan</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.85rem;">
+                                Pilih jenis laporan yang ingin diunduh dalam format Excel (.xlsx).
+                            </p>
+                            <div class="form-row" style="margin-bottom: 20px;">
+                                <div>
+                                    <label class="form-label">Filter Kota</label>
+                                    <select class="form-control" id="exportCityFilter">
+                                        <option value="all">Semua Kota</option>
+                                        <!-- Populated by JS -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Jumlah Data (Top N)</label>
+                                    <select class="form-control" id="exportLimitFilter">
+                                        <option value="all">Semua Pelanggan</option>
+                                        <option value="10">Top 10</option>
+                                        <option value="25">Top 25</option>
+                                        <option value="50">Top 50</option>
+                                        <option value="100">Top 100</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="previewReport()">
+                                    <i class="fas fa-eye"></i> Tampilkan
+                                </button>
+                                <button class="btn btn-success" onclick="exportToExcel('full')">
+                                    <i class="fas fa-file-excel"></i> Export Data Pelanggan
+                                </button>
+                                <button class="btn btn-warning" onclick="exportToExcel('ranking')">
+                                    <i class="fas fa-trophy"></i> Export Top Customer
+                                </button>
+                                <button class="btn btn-primary" onclick="exportToExcel('log')">
+                                    <i class="fas fa-history"></i> Export Log Aktivitas
+                                </button>
+                            </div>
+
+                            <!-- Report Preview Table -->
+                            <div id="reportPreview" style="display:none; margin-top: 24px;">
+                                <div class="panel">
+                                    <div class="panel-header">
+                                        <h3><i class="fas fa-table"></i> Preview Data</h3>
+                                        <span id="reportPreviewCount"
+                                            style="color: var(--text-secondary); font-size: 0.82rem;"></span>
+                                    </div>
+                                    <div class="panel-body no-pad">
+                                        <div class="table-responsive">
+                                            <table class="admin-table" id="reportPreviewTable">
+                                                <thead id="reportPreviewHead"></thead>
+                                                <tbody id="reportPreviewBody"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: PENGATURAN ===================== -->
+                <div class="page-section" id="sec-pengaturan">
+                    <!-- Banner management -->
+                    <div class="setting-card">
+                        <h4><i class="fas fa-images"></i> Banner Slider</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">
+                            Ganti gambar banner yang tampil di slider halaman utama (pelanggan).
+                        </p>
+                        <div class="banner-preview-grid" id="bannerPreviewGrid">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <div class="upload-zone" style="padding: 24px 16px;">
+                                <input type="file" id="bannerUploadInput" accept="image/*">
+                                <i class="fas fa-image" style="font-size: 1.8rem;"></i>
+                                <p>Upload banner baru</p>
+                                <small>Format: .png, .jpg &mdash; Resolusi ideal: 1920x600px</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Period management -->
+                    <div class="setting-card">
+                        <h4><i class="fas fa-calendar-check"></i> Manajemen Periode Program</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">
+                            Kelola periode program undian. Tutup periode untuk mengarsipkan data poin dan mulai periode
+                            baru.
+                        </p>
+                        <div id="periodList">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div style="margin-top: 14px;">
+                            <button class="btn btn-primary" onclick="openNewPeriodModal()">
+                                <i class="fas fa-plus"></i> Buat Periode Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: LOG AKTIVITAS ===================== -->
+                <div class="page-section" id="sec-log">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-history"></i> Log Aktivitas Admin</h3>
+                            <button class="btn btn-outline btn-sm" onclick="clearLogs()">
+                                <i class="fas fa-trash-alt"></i> Hapus Semua Log
+                            </button>
+                        </div>
+                        <div class="panel-body no-pad">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Waktu</th>
+                                            <th>Aktivitas</th>
+                                            <th>Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logTableBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS ========== -->
+
+    <!-- Detail Pelanggan Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-user"></i> <span id="detailModalTitle">Detail Pelanggan</span></h3>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div>
+                        <label class="form-label">Nama</label>
+                        <div id="detailName" style="font-weight: 600; font-size: 0.95rem;">-</div>
+                    </div>
+                    <div>
+                        <label class="form-label">No Internet</label>
+                        <div id="detailNo" style="font-weight: 600; font-size: 0.95rem;">-</div>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div>
+                        <label class="form-label">Kota</label>
+                        <div id="detailCity" style="font-size: 0.9rem;">-</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Paket</label>
+                        <div id="detailPackage" style="font-size: 0.9rem;">-</div>
+                    </div>
+                </div>
+                <h4 style="font-size: 0.9rem; margin-bottom: 12px;"><i class="fas fa-calendar-alt"
+                        style="color: var(--accent-blue);"></i> Rincian Poin Per Bulan</h4>
+                <div class="table-responsive">
+                    <table class="admin-table" id="detailPointsTable">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Tagihan</th>
+                                <th>Status Bayar</th>
+                                <th>Tgl Bayar</th>
+                                <th>Kalkulasi</th>
+                                <th>Poin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailPointsBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5"><strong>Total</strong></td>
+                                <td id="detailTotalPoin" style="font-weight: 700; color: var(--accent-yellow);">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailModal')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Template Info Modal -->
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal-box wide">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Format Template Excel</h3>
+                <button class="modal-close" onclick="closeModal('templateModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">
+                    File Excel yang diunggah harus memiliki kolom-kolom berikut (urutan bebas):
+                </p>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Kolom</th>
+                                <th>Tipe Data</th>
+                                <th>Contoh</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>nama</strong></td>
+                                <td>Text</td>
+                                <td>CV. Sinar Mandiri</td>
+                                <td>Nama lengkap pelanggan</td>
+                            </tr>
+                            <tr>
+                                <td><strong>no_internet</strong></td>
+                                <td>Text/Number</td>
+                                <td>1234567890</td>
+                                <td>Nomor internet IndiBiz</td>
+                            </tr>
+                            <tr>
+                                <td><strong>kota</strong></td>
+                                <td>Text</td>
+                                <td>Banjarmasin</td>
+                                <td>Kota pelanggan</td>
+                            </tr>
+                            <tr>
+                                <td><strong>paket</strong></td>
+                                <td>Text</td>
+                                <td>IndiBiz High Speed 100Mbps</td>
+                                <td>Nama paket langganan</td>
+                            </tr>
+                            <tr>
+                                <td><strong>bulan</strong></td>
+                                <td>Text</td>
+                                <td>April 2025</td>
+                                <td>Bulan tagihan</td>
+                            </tr>
+                            <tr>
+                                <td><strong>tagihan</strong></td>
+                                <td>Number</td>
+                                <td>1250000</td>
+                                <td>Nominal tagihan (angka saja)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>status_bayar</strong></td>
+                                <td>Text</td>
+                                <td>Lunas / Belum</td>
+                                <td>"Lunas" atau "Belum"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>tanggal_bayar</strong></td>
+                                <td>Number</td>
+                                <td>5</td>
+                                <td>Tanggal bayar (1-31). Poin: tgl 1-10 = x3, tgl 11-15 = x2, tgl 16-20 = x1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-success" onclick="downloadTemplate()">
+                        <i class="fas fa-download"></i> Download Template Excel
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('templateModal')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Period Modal -->
+    <div class="modal-overlay" id="periodModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-plus"></i> Buat Periode Baru</h3>
+                <button class="modal-close" onclick="closeModal('periodModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">Nama Periode</label>
+                        <input type="text" class="form-control" id="newPeriodName"
+                            placeholder="Contoh: Periode Juli - September 2025">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="date" class="form-control" id="newPeriodStart">
+                    </div>
+                    <div>
+                        <label class="form-label">Tanggal Akhir</label>
+                        <input type="date" class="form-control" id="newPeriodEnd">
+                    </div>
+                </div>
+                <div
+                    style="background: rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 12px; margin-top: 12px;">
+                    <p style="color: var(--accent-yellow); font-size: 0.82rem;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Perhatian:</strong> Membuat periode baru
+                        akan mengarsipkan periode aktif saat ini. Data poin pelanggan pada periode lama tetap tersimpan
+                        namun tidak aktif.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('periodModal')">Batal</button>
+                <button class="btn btn-primary" onclick="createNewPeriod()">
+                    <i class="fas fa-plus"></i> Buat Periode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="admin-script.js"></script>
+</body>
+
+</html>
