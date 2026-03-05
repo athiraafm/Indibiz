@@ -24,7 +24,7 @@ if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
 ============================================================ */
 const DEFAULT_CUSTOMERS = {
     '1234567890': {
-        name: 'CV. Sinar Mandiri',
+        name: 'Ahmad Fauzi',
         city: 'Banjarmasin',
         package: 'IndiBiz High Speed 100Mbps',
         months: {
@@ -34,7 +34,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '0987654321': {
-        name: 'PT. Maju Bersama',
+        name: 'Siti Rahmawati',
         city: 'Balikpapan',
         package: 'IndiBiz Basic 50Mbps',
         months: {
@@ -44,7 +44,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '1122334455': {
-        name: 'UD. Sentosa Jaya',
+        name: 'Budi Santoso',
         city: 'Pontianak',
         package: 'IndiBiz Pro 200Mbps',
         months: {
@@ -54,7 +54,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '5544332211': {
-        name: 'Toko Berkah Sejahtera',
+        name: 'Dewi Lestari',
         city: 'Samarinda',
         package: 'IndiBiz Basic 50Mbps',
         months: {
@@ -64,7 +64,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '3344556677': {
-        name: 'CV. Borneo Utama',
+        name: 'Rizky Pratama',
         city: 'Palangkaraya',
         package: 'IndiBiz High Speed 100Mbps',
         months: {
@@ -74,7 +74,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '5566778899': {
-        name: 'Toko Elektronik Prima',
+        name: 'Nur Hidayah',
         city: 'Tarakan',
         package: 'IndiBiz Basic 50Mbps',
         months: {
@@ -84,7 +84,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '4455667788': {
-        name: 'PT. Global Nusantara',
+        name: 'Hendra Wijaya',
         city: 'Singkawang',
         package: 'IndiBiz Pro 200Mbps',
         months: {
@@ -94,7 +94,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '6677889900': {
-        name: 'UD. Harapan Baru',
+        name: 'Andi Saputra',
         city: 'Bontang',
         package: 'IndiBiz Basic 50Mbps',
         months: {
@@ -104,7 +104,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '7788990011': {
-        name: 'CV. Makmur Sentosa',
+        name: 'Maya Putri',
         city: 'Banjarbaru',
         package: 'IndiBiz High Speed 100Mbps',
         months: {
@@ -114,7 +114,7 @@ const DEFAULT_CUSTOMERS = {
         }
     },
     '8899001122': {
-        name: 'PT. Mahakam Abadi',
+        name: 'Rahmat Hidayat',
         city: 'Tenggarong',
         package: 'IndiBiz Basic 50Mbps',
         months: {
@@ -388,6 +388,8 @@ function renderBarChart(containerId, dataObj) {
    DATA PELANGGAN TABLE
 ============================================================ */
 let currentSearchFilter = '';
+let currentSortField = 'poin';
+let currentSortDir = 'desc';
 
 function renderCustomerTable(customers, filter = '') {
     const tbody = document.getElementById('customerTableBody');
@@ -405,7 +407,16 @@ function renderCustomerTable(customers, filter = '') {
         );
     }
 
-    filtered.sort((a, b) => getTotalPoin(b[1]) - getTotalPoin(a[1]));
+    // Apply sorting
+    if (currentSortField === 'poin') {
+        filtered.sort((a, b) => currentSortDir === 'desc' ? getTotalPoin(b[1]) - getTotalPoin(a[1]) : getTotalPoin(a[1]) - getTotalPoin(b[1]));
+    } else if (currentSortField === 'nama') {
+        filtered.sort((a, b) => currentSortDir === 'asc' ? a[1].name.localeCompare(b[1].name) : b[1].name.localeCompare(a[1].name));
+    } else if (currentSortField === 'kota') {
+        filtered.sort((a, b) => currentSortDir === 'asc' ? a[1].city.localeCompare(b[1].city) : b[1].city.localeCompare(a[1].city));
+    } else if (currentSortField === 'kupon') {
+        filtered.sort((a, b) => currentSortDir === 'desc' ? getTotalKupon(b[1]) - getTotalKupon(a[1]) : getTotalKupon(a[1]) - getTotalKupon(b[1]));
+    }
 
     if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-muted);">
@@ -461,6 +472,16 @@ if (customerSearch) {
         currentSearchFilter = e.target.value.trim();
         renderCustomerTable(loadCustomers(), currentSearchFilter);
     });
+}
+
+function sortCustomerTable(field) {
+    if (currentSortField === field) {
+        currentSortDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+    } else {
+        currentSortField = field;
+        currentSortDir = (field === 'nama' || field === 'kota') ? 'asc' : 'desc';
+    }
+    renderCustomerTable(loadCustomers(), currentSearchFilter);
 }
 
 /* ============================================================
@@ -686,8 +707,8 @@ function showTemplateInfo() {
 
 function downloadTemplate() {
     const templateData = [
-        { nama: 'CV. Contoh Usaha', no_internet: '1234567890', kota: 'Banjarmasin', paket: 'IndiBiz High Speed 100Mbps', bulan: 'April 2025', tagihan: 1250000, tanggal_bayar: 5, status_bayar: 'Lunas' },
-        { nama: 'PT. Maju Jaya', no_internet: '0987654321', kota: 'Balikpapan', paket: 'IndiBiz Basic 50Mbps', bulan: 'April 2025', tagihan: 750000, tanggal_bayar: 18, status_bayar: 'Lunas' }
+        { nama: 'Contoh Nama', no_internet: '1234567890', kota: 'Banjarmasin', paket: 'IndiBiz High Speed 100Mbps', bulan: 'April 2025', tagihan: 1250000, tanggal_bayar: 5, status_bayar: 'Lunas' },
+        { nama: 'Contoh Lain', no_internet: '0987654321', kota: 'Balikpapan', paket: 'IndiBiz Basic 50Mbps', bulan: 'April 2025', tagihan: 750000, tanggal_bayar: 18, status_bayar: 'Lunas' }
     ];
 
     const ws = XLSX.utils.json_to_sheet(templateData);
@@ -950,6 +971,49 @@ function renderSettings() {
     renderPeriodList();
 }
 
+/* ============================================================
+   SETTINGS – CHANGE PASSWORD
+============================================================ */
+function changePassword() {
+    const currentPass = document.getElementById('currentPassword').value;
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+
+    if (!currentPass || !newPass || !confirmPass) {
+        showToast('error', 'Semua field password wajib diisi.');
+        return;
+    }
+
+    // Load saved credentials or use defaults
+    const savedCreds = JSON.parse(localStorage.getItem('adminCredentials') || 'null');
+    const actualPassword = savedCreds ? savedCreds.password : 'admin123';
+
+    if (currentPass !== actualPassword) {
+        showToast('error', 'Password lama tidak sesuai.');
+        return;
+    }
+
+    if (newPass.length < 6) {
+        showToast('error', 'Password baru minimal 6 karakter.');
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        showToast('error', 'Konfirmasi password tidak cocok.');
+        return;
+    }
+
+    const username = savedCreds ? savedCreds.username : 'admin';
+    localStorage.setItem('adminCredentials', JSON.stringify({ username, password: newPass }));
+
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+
+    addLog('edit', 'Ganti Password', 'Admin berhasil mengubah password.');
+    showToast('success', 'Password berhasil diubah!');
+}
+
 function renderBannerPreview() {
     const grid = document.getElementById('bannerPreviewGrid');
     if (!grid) return;
@@ -1141,14 +1205,16 @@ function showToast(type, message) {
    INIT
 ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    // Reset mock data to use new point system with tanggalBayar
+    // Reset mock data if format is old (missing tanggalBayar or still has CV/PT names)
     const stored = localStorage.getItem('adminCustomers');
     if (stored) {
         const data = JSON.parse(stored);
         const firstKey = Object.keys(data)[0];
         if (firstKey) {
             const firstMonth = Object.values(data[firstKey].months)[0];
-            if (firstMonth && firstMonth.tanggalBayar === undefined) {
+            const hasOldFormat = firstMonth && firstMonth.tanggalBayar === undefined;
+            const hasOldNames = data[firstKey].name && (data[firstKey].name.startsWith('CV.') || data[firstKey].name.startsWith('PT.') || data[firstKey].name.startsWith('UD.') || data[firstKey].name.startsWith('Toko '));
+            if (hasOldFormat || hasOldNames) {
                 localStorage.setItem('adminCustomers', JSON.stringify(DEFAULT_CUSTOMERS));
             }
         }

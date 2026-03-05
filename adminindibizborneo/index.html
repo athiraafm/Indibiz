@@ -65,7 +65,11 @@
             const user = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value;
 
-            if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+            const savedCreds = JSON.parse(localStorage.getItem('adminCredentials') || 'null');
+            const validUser = savedCreds ? savedCreds.username : ADMIN_CREDENTIALS.username;
+            const validPass = savedCreds ? savedCreds.password : ADMIN_CREDENTIALS.password;
+
+            if (user === validUser && pass === validPass) {
                 sessionStorage.setItem('adminLoggedIn', 'true');
 
                 // Log login activity
