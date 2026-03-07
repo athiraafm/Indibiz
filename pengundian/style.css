@@ -41,6 +41,19 @@ body {
     opacity: 0;
 }
 
+.particle-square {
+    border-radius: 2px;
+}
+
+.particle-diamond {
+    border-radius: 2px;
+}
+
+.particle-ribbon {
+    border-radius: 2px;
+    animation: floatRibbon linear infinite;
+}
+
 @keyframes floatParticle {
     0% {
         transform: translateY(100vh) rotate(0deg);
@@ -48,11 +61,11 @@ body {
     }
 
     10% {
-        opacity: 0.5;
+        opacity: 0.6;
     }
 
     90% {
-        opacity: 0.5;
+        opacity: 0.6;
     }
 
     100% {
@@ -61,23 +74,47 @@ body {
     }
 }
 
-/* ============= 3D VARIO BACKGROUND ============= */
+@keyframes floatRibbon {
+    0% {
+        transform: translateY(100vh) rotate(0deg) scaleX(1);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translateY(50vh) rotate(180deg) scaleX(-1);
+    }
+
+    90% {
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: translateY(-100px) rotate(360deg) scaleX(1);
+        opacity: 0;
+    }
+}
+
+/* ============= PCX 160 BACKGROUND IMAGE ============= */
 .vario-bg {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 900px;
-    height: 700px;
-    opacity: 0.18;
+    width: 800px;
+    height: 600px;
+    opacity: 0.13;
     z-index: 0;
     pointer-events: none;
 }
 
-.vario-bg iframe {
+.vario-bg img {
     width: 100%;
     height: 100%;
-    border: none;
+    object-fit: contain;
 }
 
 /* ============= LOTTERY SECTION ============= */
@@ -92,11 +129,33 @@ body {
     padding: 40px 20px;
 }
 
+/* ============= LOGOS ============= */
+.lottery-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+    animation: fadeInDown 1s ease;
+}
+
+.lottery-logo {
+    height: 60px;
+    filter: drop-shadow(0 4px 12px rgba(29, 78, 216, 0.25));
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.partner-logo {
+    height: 50px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+    animation: pulse 3s ease-in-out infinite;
+}
+
 /* ============= HEADER ============= */
 .lottery-header {
     text-align: center;
     margin-bottom: 40px;
-    animation: fadeInDown 1s ease;
+    animation: fadeInDown 1s ease 0.2s both;
 }
 
 @keyframes fadeInDown {
@@ -109,13 +168,6 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.lottery-logo {
-    height: 60px;
-    margin-bottom: 16px;
-    filter: drop-shadow(0 4px 12px rgba(29, 78, 216, 0.25));
-    animation: pulse 3s ease-in-out infinite;
 }
 
 @keyframes pulse {
@@ -137,7 +189,7 @@ body {
 }
 
 .title-line1 {
-    font-size: 2.8rem;
+    font-size: 2.4rem;
     font-weight: 900;
     background: linear-gradient(135deg, #1d4ed8, #7c3aed, #db2777, #d97706);
     background-size: 300% 300%;
@@ -146,6 +198,14 @@ body {
     background-clip: text;
     animation: gradientShift 4s ease infinite;
     letter-spacing: 2px;
+}
+
+.title-line3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #475569;
+    letter-spacing: 1px;
+    margin-top: 2px;
 }
 
 @keyframes gradientShift {
@@ -168,6 +228,7 @@ body {
     color: #334155;
     letter-spacing: 6px;
     text-transform: uppercase;
+    margin-top: 8px;
 }
 
 .lottery-subtitle {
@@ -177,6 +238,11 @@ body {
     font-weight: 700;
     letter-spacing: 1px;
     animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.lottery-subtitle i {
+    color: #d97706;
+    margin: 0 4px;
 }
 
 @keyframes pulseGlow {
@@ -212,8 +278,8 @@ body {
 
 .slot-box {
     display: flex;
-    gap: 16px;
-    padding: 32px 40px;
+    gap: 8px;
+    padding: 24px 28px;
     background: rgba(255, 255, 255, 0.75);
     border: 3px solid rgba(29, 78, 216, 0.18);
     border-radius: 24px;
@@ -225,10 +291,10 @@ body {
 }
 
 .slot-reel {
-    width: 120px;
-    height: 160px;
+    width: 70px;
+    height: 100px;
     background: linear-gradient(180deg, #eef2ff 0%, #ffffff 50%, #eef2ff 100%);
-    border-radius: 14px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -242,7 +308,7 @@ body {
 }
 
 .slot-reel span {
-    font-size: 5rem;
+    font-size: 3rem;
     font-weight: 900;
     color: #1e3a8a;
     font-variant-numeric: tabular-nums;
@@ -282,7 +348,7 @@ body {
     }
 }
 
-/* ============= DECORATIVE ORNAMENTS ============= */
+/* ============= DECORATIVE ORNAMENTS - MANY MORE ============= */
 .ornament {
     position: absolute;
     z-index: 1;
@@ -310,6 +376,56 @@ body {
     animation: giftBounce 3s ease-in-out infinite;
 }
 
+.ornament-ribbon i {
+    font-size: 1.5rem;
+    color: #ec4899;
+    filter: drop-shadow(0 2px 8px rgba(236, 72, 153, 0.4));
+    animation: ribbonWave 3s ease-in-out infinite;
+}
+
+.ornament-confetti i {
+    font-size: 1.3rem;
+    color: #f59e0b;
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+    animation: confettiSpin 5s linear infinite;
+}
+
+.ornament-medal i {
+    font-size: 1.7rem;
+    color: #f59e0b;
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+    animation: medalSwing 2.5s ease-in-out infinite;
+}
+
+.ornament-crown i {
+    font-size: 2rem;
+    color: #d97706;
+    filter: drop-shadow(0 3px 10px rgba(217, 119, 6, 0.5));
+    animation: crownFloat 3s ease-in-out infinite;
+}
+
+.ornament-burst i {
+    font-size: 1.8rem;
+    color: #6366f1;
+    filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.4));
+    animation: starSpin 6s linear infinite;
+}
+
+.ornament-balloon i {
+    font-size: 1.5rem;
+    color: #10b981;
+    filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.4));
+    animation: giftBounce 2.5s ease-in-out infinite;
+}
+
+.ornament-star2 i {
+    font-size: 1.4rem;
+    color: #8b5cf6;
+    filter: drop-shadow(0 2px 8px rgba(139, 92, 246, 0.4));
+    animation: sparklePulse 3s ease-in-out infinite;
+}
+
+/* Ornament positions */
 .ornament-tl {
     top: 18%;
     left: 8%;
@@ -343,6 +459,80 @@ body {
     top: 50%;
     right: 5%;
     animation-delay: -0.8s;
+}
+
+/* Additional positions */
+.ornament-tl2 {
+    top: 12%;
+    left: 15%;
+    animation-delay: -0.3s;
+}
+
+.ornament-tr2 {
+    top: 12%;
+    right: 15%;
+    animation-delay: -2.5s;
+}
+
+.ornament-bl2 {
+    bottom: 28%;
+    left: 6%;
+    animation-delay: -1.2s;
+}
+
+.ornament-br2 {
+    bottom: 28%;
+    right: 6%;
+    animation-delay: -0.7s;
+}
+
+.ornament-ml2 {
+    top: 38%;
+    left: 10%;
+    animation-delay: -1.8s;
+}
+
+.ornament-mr2 {
+    top: 38%;
+    right: 10%;
+    animation-delay: -2.2s;
+}
+
+.ornament-tc {
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ornament-bc {
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-delay: -1.5s;
+}
+
+.ornament-tl3 {
+    top: 30%;
+    left: 3%;
+    animation-delay: -3s;
+}
+
+.ornament-tr3 {
+    top: 30%;
+    right: 3%;
+    animation-delay: -0.5s;
+}
+
+.ornament-ml3 {
+    top: 60%;
+    left: 8%;
+    animation-delay: -1s;
+}
+
+.ornament-mr3 {
+    top: 60%;
+    right: 8%;
+    animation-delay: -2s;
 }
 
 @keyframes starSpin {
@@ -394,6 +584,60 @@ body {
 
     75% {
         transform: translateY(-10px) rotate(5deg);
+    }
+}
+
+@keyframes ribbonWave {
+
+    0%,
+    100% {
+        transform: rotate(-10deg) scale(1);
+    }
+
+    33% {
+        transform: rotate(15deg) scale(1.1);
+    }
+
+    66% {
+        transform: rotate(-5deg) scale(1.05);
+    }
+}
+
+@keyframes confettiSpin {
+    0% {
+        transform: rotate(0deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(180deg) translateY(-8px);
+    }
+
+    100% {
+        transform: rotate(360deg) translateY(0);
+    }
+}
+
+@keyframes medalSwing {
+
+    0%,
+    100% {
+        transform: rotate(-8deg);
+    }
+
+    50% {
+        transform: rotate(8deg);
+    }
+}
+
+@keyframes crownFloat {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-12px) scale(1.1);
     }
 }
 
@@ -544,6 +788,65 @@ body {
     box-shadow: 0 8px 32px rgba(29, 78, 216, 0.35);
 }
 
+/* ============= STOP BUTTON ============= */
+.btn-stop {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 60px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #ffffff;
+    background: linear-gradient(135deg, #dc2626, #ef4444, #f87171);
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 8px 32px rgba(220, 38, 38, 0.35),
+        0 0 60px rgba(239, 68, 68, 0.15);
+    animation: fadeInUp 0.5s ease both, stopBtnPulse 1s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-stop::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes stopBtnPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 8px 32px rgba(220, 38, 38, 0.35), 0 0 60px rgba(239, 68, 68, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 8px 48px rgba(220, 38, 38, 0.6), 0 0 100px rgba(239, 68, 68, 0.35);
+        transform: scale(1.03);
+    }
+}
+
+.btn-stop:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 48px rgba(220, 38, 38, 0.5), 0 0 100px rgba(239, 68, 68, 0.3);
+}
+
+.btn-stop:active {
+    transform: translateY(0) scale(0.98);
+}
+
 /* ============= STATUS TEXT ============= */
 .status-text {
     margin-top: 24px;
@@ -612,25 +915,25 @@ body {
 /* Winner Slot Box */
 .winner-slot-box {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     justify-content: center;
     margin-bottom: 36px;
     animation: fadeInUp 0.8s ease 0.2s both;
 }
 
 .winner-slot-box .slot-reel {
-    width: 80px;
-    height: 100px;
+    width: 52px;
+    height: 72px;
     background: linear-gradient(180deg, #fef3c7, #fde68a, #fef3c7);
     border: 2px solid #f59e0b;
-    border-radius: 10px;
+    border-radius: 8px;
     box-shadow:
         0 4px 20px rgba(245, 158, 11, 0.25),
         0 0 40px rgba(245, 158, 11, 0.1);
 }
 
 .winner-slot-box .slot-reel span {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 900;
     color: #92400e;
 }
@@ -710,19 +1013,35 @@ body {
 
 .btn-selesai {
     color: #ffffff;
-    background: linear-gradient(135deg, #6b7280, #4b5563);
-    box-shadow: 0 6px 24px rgba(107, 114, 128, 0.3);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3);
 }
 
 .btn-selesai:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(107, 114, 128, 0.5);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.5);
 }
 
 /* ============= RESPONSIVE ============= */
 @media (max-width: 768px) {
+    .lottery-logos {
+        gap: 14px;
+    }
+
+    .lottery-logo {
+        height: 40px;
+    }
+
+    .partner-logo {
+        height: 32px;
+    }
+
     .title-line1 {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
+    }
+
+    .title-line3 {
+        font-size: 0.8rem;
     }
 
     .title-line2 {
@@ -731,17 +1050,17 @@ body {
     }
 
     .slot-box {
-        gap: 6px;
-        padding: 16px 18px;
+        gap: 4px;
+        padding: 12px 14px;
     }
 
     .slot-reel {
-        width: 60px;
-        height: 85px;
+        width: 34px;
+        height: 50px;
     }
 
     .slot-reel span {
-        font-size: 2.5rem;
+        font-size: 1.5rem;
     }
 
     .slot-ribbon-left,
@@ -753,7 +1072,8 @@ body {
         display: none;
     }
 
-    .btn-start {
+    .btn-start,
+    .btn-stop {
         padding: 14px 40px;
         font-size: 1.1rem;
     }
@@ -763,12 +1083,12 @@ body {
     }
 
     .winner-slot-box .slot-reel {
-        width: 50px;
-        height: 70px;
+        width: 30px;
+        height: 45px;
     }
 
     .winner-slot-box .slot-reel span {
-        font-size: 2rem;
+        font-size: 1.4rem;
     }
 
     .winner-actions {
@@ -776,7 +1096,18 @@ body {
     }
 
     .vario-bg {
-        width: 450px;
-        height: 350px;
+        width: 350px;
+        height: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slot-reel {
+        width: 28px;
+        height: 42px;
+    }
+
+    .slot-reel span {
+        font-size: 1.3rem;
     }
 }

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Dashboard Admin – IndiBiz Borneo</title>
-    <link rel="stylesheet" href="css/admin-style.css?v=4">
+    <link rel="stylesheet" href="css/admin-style.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -31,18 +31,9 @@
                 <a href="#" data-section="pelanggan">
                     <i class="fas fa-users"></i> Data Pelanggan
                 </a>
-                <a href="#" data-section="top-customer">
-                    <i class="fas fa-trophy"></i> Top Customer
-                </a>
-                <a href="#" data-section="laporan">
-                    <i class="fas fa-file-export"></i> Laporan & Export
-                </a>
                 <div class="nav-section-title">Sistem</div>
                 <a href="#" data-section="pengaturan">
                     <i class="fas fa-cog"></i> Pengaturan
-                </a>
-                <a href="#" data-section="log">
-                    <i class="fas fa-history"></i> Log Aktivitas
                 </a>
             </nav>
             <div class="sidebar-footer">
@@ -78,101 +69,93 @@
 
                 <!-- ===================== SECTION: OVERVIEW ===================== -->
                 <div class="page-section active" id="sec-overview">
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card blue">
+                    <!-- Stats (3 cards only, enlarged) -->
+                    <div class="stats-grid stats-grid-3">
+                        <div class="stat-card stat-card-lg blue">
                             <div class="stat-icon"><i class="fas fa-users"></i></div>
                             <div class="stat-label">Total Pelanggan</div>
                             <div class="stat-value" id="statCustomers">0</div>
                         </div>
-                        <div class="stat-card green">
+                        <div class="stat-card stat-card-lg green">
                             <div class="stat-icon"><i class="fas fa-coins"></i></div>
                             <div class="stat-label">Total Poin Beredar</div>
                             <div class="stat-value" id="statPoints">0</div>
                         </div>
-                        <div class="stat-card yellow">
+                        <div class="stat-card stat-card-lg yellow">
                             <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
                             <div class="stat-label">Total Kupon</div>
                             <div class="stat-value" id="statCoupons">0</div>
-                        </div>
-                        <div class="stat-card cyan">
-                            <div class="stat-icon"><i class="fas fa-search"></i></div>
-                            <div class="stat-label">Aktivitas Cek Poin</div>
-                            <div class="stat-value" id="statSearches">0</div>
-                        </div>
-                    </div>
-
-                    <!-- Charts -->
-                    <div class="chart-row">
-                        <div class="mini-chart">
-                            <h4><i class="fas fa-chart-bar"></i> Poin Per Kota</h4>
-                            <div class="bar-chart" id="chartCity"></div>
-                        </div>
-                        <div class="mini-chart">
-                            <h4><i class="fas fa-chart-line"></i> Distribusi Kupon</h4>
-                            <div class="bar-chart" id="chartCoupon"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- ===================== SECTION: DATA PELANGGAN ===================== -->
                 <div class="page-section" id="sec-pelanggan">
-                    <!-- Import Panel -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3><i class="fas fa-file-upload"></i> Import Data Tagihan</h3>
-                            <button class="btn btn-outline btn-sm" onclick="showTemplateInfo()">
-                                <i class="fas fa-info-circle"></i> Format Template
-                            </button>
-                        </div>
-                        <div class="panel-body">
-                            <div class="upload-zone" id="uploadZone">
-                                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p>Drag & drop file Excel di sini, atau <strong>klik untuk memilih file</strong></p>
-                                <small>Format: .xlsx, .xls, .csv &mdash; Kolom: Nama, No Internet, Kota, Paket, Bulan,
-                                    Tagihan, Tanggal Bayar, Status Bayar</small>
-                            </div>
-                            <!-- Import Preview -->
-                            <div id="importPreview" style="display:none; margin-top: 20px;">
-                                <div class="preview-stats" id="previewStats"></div>
-                                <div class="table-responsive">
-                                    <table class="admin-table" id="previewTable">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Nama</th>
-                                                <th>No Internet</th>
-                                                <th>Kota</th>
-                                                <th>Paket</th>
-                                                <th>Bulan</th>
-                                                <th>Tagihan</th>
-                                                <th>Tgl Bayar</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="previewBody"></tbody>
-                                    </table>
-                                </div>
-                                <div style="margin-top: 16px; display: flex; gap: 8px;">
-                                    <button class="btn btn-primary" onclick="confirmImport()">
-                                        <i class="fas fa-check"></i> Konfirmasi Import
-                                    </button>
-                                    <button class="btn btn-outline" onclick="cancelImport()">
-                                        <i class="fas fa-times"></i> Batal
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Customer Data Table -->
                     <div class="panel">
                         <div class="panel-header">
                             <h3><i class="fas fa-database"></i> Database Pelanggan</h3>
+                            <div class="panel-header-actions">
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" onclick="exportToExcel('full')">
+                                        <i class="fas fa-file-excel"></i> Export Data Pelanggan
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="exportToExcel('ranking')">
+                                        <i class="fas fa-trophy"></i> Export Top Customer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-filter-row">
                             <div class="search-bar">
                                 <i class="fas fa-search"></i>
                                 <input type="text" id="customerSearch" placeholder="Cari nama, no internet, kota...">
+                            </div>
+                            <div class="filter-bar">
+                                <label class="filter-label"><i class="fas fa-filter"></i> Witel:</label>
+                                <select class="form-control form-control-sm" id="customerCityFilter">
+                                    <option value="all">Semua Witel</option>
+                                    <optgroup label="Balikpapan">
+                                        <option value="Inner Witel Balikpapan">Inner Witel Balikpapan</option>
+                                        <option value="Paser">Paser</option>
+                                        <option value="Penajam">Penajam</option>
+                                    </optgroup>
+                                    <optgroup label="Kalbar">
+                                        <option value="Pontianak">Pontianak</option>
+                                        <option value="Ketapang">Ketapang</option>
+                                        <option value="Mempawah">Mempawah</option>
+                                        <option value="Sanggau">Sanggau</option>
+                                        <option value="Singkawang">Singkawang</option>
+                                        <option value="Sintang">Sintang</option>
+                                    </optgroup>
+                                    <optgroup label="Kalselteng">
+                                        <option value="Buntok">Buntok</option>
+                                        <option value="Muara Teweh">Muara Teweh</option>
+                                        <option value="Palangkaraya">Palangkaraya</option>
+                                        <option value="Pangkalan Bun">Pangkalan Bun</option>
+                                        <option value="Sampit">Sampit</option>
+                                    </optgroup>
+                                    <optgroup label="Kalsel">
+                                        <option value="Inner Witel Kalsel">Inner Witel Kalsel</option>
+                                        <option value="Banjarbaru">Banjarbaru</option>
+                                        <option value="Batulicin">Batulicin</option>
+                                        <option value="Kandangan">Kandangan</option>
+                                        <option value="Kotabaru">Kotabaru</option>
+                                        <option value="Pelaihari">Pelaihari</option>
+                                        <option value="Tanjung Tabalong">Tanjung Tabalong</option>
+                                    </optgroup>
+                                    <optgroup label="Kaltimtara">
+                                        <option value="Inner Witel Samarinda">Inner Witel Samarinda</option>
+                                        <option value="Bontang">Bontang</option>
+                                        <option value="Tenggarong">Tenggarong</option>
+                                        <option value="Melak">Melak</option>
+                                        <option value="Malinau">Malinau</option>
+                                        <option value="Nunukan">Nunukan</option>
+                                        <option value="Tanjung Redeb">Tanjung Redeb</option>
+                                        <option value="Tanjung Selor">Tanjung Selor</option>
+                                        <option value="Tarakan">Tarakan</option>
+                                    </optgroup>
+                                </select>
                             </div>
                         </div>
                         <div class="panel-body no-pad">
@@ -182,11 +165,11 @@
                                         <tr>
                                             <th>No</th>
                                             <th style="cursor:pointer" onclick="sortCustomerTable('nama')">Nama Customer
-                                                <i class="fas fa-sort"></i></th>
+                                                <i class="fas fa-sort"></i>
+                                            </th>
                                             <th>No Internet</th>
                                             <th style="cursor:pointer" onclick="sortCustomerTable('kota')">Kota <i
                                                     class="fas fa-sort"></i></th>
-                                            <th>Paket</th>
                                             <th style="cursor:pointer" onclick="sortCustomerTable('poin')">Total Poin <i
                                                     class="fas fa-sort"></i></th>
                                             <th style="cursor:pointer" onclick="sortCustomerTable('kupon')">Kupon <i
@@ -203,133 +186,8 @@
                     </div>
                 </div>
 
-                <!-- ===================== SECTION: TOP CUSTOMER ===================== -->
-                <div class="page-section" id="sec-top-customer">
-                    <!-- Publish Status -->
-                    <div class="publish-status unpublished" id="publishStatus">
-                        <i class="fas fa-info-circle"></i>
-                        <span id="publishStatusText">Data belum dipublish ke halaman pelanggan.</span>
-                    </div>
-
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3><i class="fas fa-trophy"></i> Ranking Pelanggan</h3>
-                            <div class="btn-group">
-                                <button class="btn btn-primary" onclick="publishRanking()">
-                                    <i class="fas fa-globe"></i> Publish ke Website
-                                </button>
-                            </div>
-                        </div>
-                        <div class="panel-body no-pad">
-                            <div class="table-responsive">
-                                <table class="admin-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Rank</th>
-                                            <th>Nama Asli</th>
-                                            <th>Nama Sensor (Publik)</th>
-                                            <th>No Internet</th>
-                                            <th>Kota</th>
-                                            <th>Total Poin</th>
-                                            <th>Kupon</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="rankingTableBody">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===================== SECTION: LAPORAN ===================== -->
-                <div class="page-section" id="sec-laporan">
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3><i class="fas fa-file-export"></i> Export Laporan</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.85rem;">
-                                Pilih jenis laporan yang ingin diunduh dalam format Excel (.xlsx).
-                            </p>
-                            <div class="form-row" style="margin-bottom: 20px;">
-                                <div>
-                                    <label class="form-label">Filter Kota</label>
-                                    <select class="form-control" id="exportCityFilter">
-                                        <option value="all">Semua Kota</option>
-                                        <!-- Populated by JS -->
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label">Jumlah Data (Top N)</label>
-                                    <select class="form-control" id="exportLimitFilter">
-                                        <option value="all">Semua Pelanggan</option>
-                                        <option value="10">Top 10</option>
-                                        <option value="25">Top 25</option>
-                                        <option value="50">Top 50</option>
-                                        <option value="100">Top 100</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-primary" onclick="previewReport()">
-                                    <i class="fas fa-eye"></i> Tampilkan
-                                </button>
-                                <button class="btn btn-success" onclick="exportToExcel('full')">
-                                    <i class="fas fa-file-excel"></i> Export Data Pelanggan
-                                </button>
-                                <button class="btn btn-warning" onclick="exportToExcel('ranking')">
-                                    <i class="fas fa-trophy"></i> Export Top Customer
-                                </button>
-                                <button class="btn btn-primary" onclick="exportToExcel('log')">
-                                    <i class="fas fa-history"></i> Export Log Aktivitas
-                                </button>
-                            </div>
-
-                            <!-- Report Preview Table -->
-                            <div id="reportPreview" style="display:none; margin-top: 24px;">
-                                <div class="panel">
-                                    <div class="panel-header">
-                                        <h3><i class="fas fa-table"></i> Preview Data</h3>
-                                        <span id="reportPreviewCount"
-                                            style="color: var(--text-secondary); font-size: 0.82rem;"></span>
-                                    </div>
-                                    <div class="panel-body no-pad">
-                                        <div class="table-responsive">
-                                            <table class="admin-table" id="reportPreviewTable">
-                                                <thead id="reportPreviewHead"></thead>
-                                                <tbody id="reportPreviewBody"></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ===================== SECTION: PENGATURAN ===================== -->
                 <div class="page-section" id="sec-pengaturan">
-                    <!-- Banner management -->
-                    <div class="setting-card">
-                        <h4><i class="fas fa-images"></i> Banner Slider</h4>
-                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">
-                            Ganti gambar banner yang tampil di slider halaman utama (pelanggan).
-                        </p>
-                        <div class="banner-preview-grid" id="bannerPreviewGrid">
-                            <!-- Populated by JS -->
-                        </div>
-                        <div style="margin-top: 16px;">
-                            <div class="upload-zone" style="padding: 24px 16px;">
-                                <input type="file" id="bannerUploadInput" accept="image/*">
-                                <i class="fas fa-image" style="font-size: 1.8rem;"></i>
-                                <p>Upload banner baru</p>
-                                <small>Format: .png, .jpg &mdash; Resolusi ideal: 1920x600px</small>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Period management -->
                     <div class="setting-card">
                         <h4><i class="fas fa-calendar-check"></i> Manajemen Periode Program</h4>
@@ -378,35 +236,6 @@
                             <button class="btn btn-primary" onclick="changePassword()">
                                 <i class="fas fa-save"></i> Simpan Password Baru
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ===================== SECTION: LOG AKTIVITAS ===================== -->
-                <div class="page-section" id="sec-log">
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h3><i class="fas fa-history"></i> Log Aktivitas Admin</h3>
-                            <button class="btn btn-outline btn-sm" onclick="clearLogs()">
-                                <i class="fas fa-trash-alt"></i> Hapus Semua Log
-                            </button>
-                        </div>
-                        <div class="panel-body no-pad">
-                            <div class="table-responsive">
-                                <table class="admin-table">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Waktu</th>
-                                            <th>Aktivitas</th>
-                                            <th>Detail</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="logTableBody">
-                                        <!-- Populated by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -470,93 +299,6 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('detailModal')">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-
-
-    <!-- Template Info Modal -->
-    <div class="modal-overlay" id="templateModal">
-        <div class="modal-box wide">
-            <div class="modal-header">
-                <h3><i class="fas fa-info-circle"></i> Format Template Excel</h3>
-                <button class="modal-close" onclick="closeModal('templateModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">
-                    File Excel yang diunggah harus memiliki kolom-kolom berikut (urutan bebas):
-                </p>
-                <div class="table-responsive">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Nama Kolom</th>
-                                <th>Tipe Data</th>
-                                <th>Contoh</th>
-                                <th>Keterangan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>nama</strong></td>
-                                <td>Text</td>
-                                <td>CV. Sinar Mandiri</td>
-                                <td>Nama lengkap pelanggan</td>
-                            </tr>
-                            <tr>
-                                <td><strong>no_internet</strong></td>
-                                <td>Text/Number</td>
-                                <td>1234567890</td>
-                                <td>Nomor internet IndiBiz</td>
-                            </tr>
-                            <tr>
-                                <td><strong>kota</strong></td>
-                                <td>Text</td>
-                                <td>Banjarmasin</td>
-                                <td>Kota pelanggan</td>
-                            </tr>
-                            <tr>
-                                <td><strong>paket</strong></td>
-                                <td>Text</td>
-                                <td>IndiBiz High Speed 100Mbps</td>
-                                <td>Nama paket langganan</td>
-                            </tr>
-                            <tr>
-                                <td><strong>bulan</strong></td>
-                                <td>Text</td>
-                                <td>April 2025</td>
-                                <td>Bulan tagihan</td>
-                            </tr>
-                            <tr>
-                                <td><strong>tagihan</strong></td>
-                                <td>Number</td>
-                                <td>1250000</td>
-                                <td>Nominal tagihan (angka saja)</td>
-                            </tr>
-                            <tr>
-                                <td><strong>status_bayar</strong></td>
-                                <td>Text</td>
-                                <td>Lunas / Belum</td>
-                                <td>"Lunas" atau "Belum"</td>
-                            </tr>
-                            <tr>
-                                <td><strong>tanggal_bayar</strong></td>
-                                <td>Number</td>
-                                <td>5</td>
-                                <td>Tanggal bayar (1-31). Poin: tgl 1-10 = x3, tgl 11-15 = x2, tgl 16-20 = x1</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div style="margin-top: 16px;">
-                    <button class="btn btn-success" onclick="downloadTemplate()">
-                        <i class="fas fa-download"></i> Download Template Excel
-                    </button>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('templateModal')">Tutup</button>
             </div>
         </div>
     </div>

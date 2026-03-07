@@ -486,6 +486,12 @@ textarea {
     margin-bottom: 28px;
 }
 
+/* Enlarged 3-card layout */
+.stats-grid.stats-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
 .stat-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -494,6 +500,10 @@ textarea {
     position: relative;
     overflow: hidden;
     transition: var(--transition);
+}
+
+.stat-card.stat-card-lg {
+    padding: 36px 32px;
 }
 
 .stat-card:hover {
@@ -510,6 +520,12 @@ textarea {
     height: 80px;
     border-radius: 0 0 0 80px;
     opacity: 0.08;
+}
+
+.stat-card.stat-card-lg::after {
+    width: 120px;
+    height: 120px;
+    border-radius: 0 0 0 120px;
 }
 
 .stat-card.blue::after {
@@ -539,6 +555,14 @@ textarea {
     margin-bottom: 14px;
 }
 
+.stat-card-lg .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
 .stat-card.blue .stat-icon {
     background: rgba(59, 130, 246, 0.15);
     color: var(--accent-blue);
@@ -565,9 +589,18 @@ textarea {
     margin-bottom: 4px;
 }
 
+.stat-card-lg .stat-label {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
 .stat-value {
     font-size: 1.6rem;
     font-weight: 700;
+}
+
+.stat-card-lg .stat-value {
+    font-size: 2.4rem;
 }
 
 /* ==================================================
@@ -601,6 +634,40 @@ textarea {
 
 .panel-header h3 i {
     color: var(--accent-blue);
+}
+
+.panel-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(29, 78, 216, 0.02);
+    flex-wrap: wrap;
+}
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.form-control-sm {
+    padding: 7px 12px;
+    font-size: 0.82rem;
 }
 
 .panel-body {

@@ -1,27 +1,31 @@
 /* ==================================================
    ADMIN DASHBOARD – admin-script.js
-   Auth | Navigation | Data Management | Import/Export
-   Top Customer | CMS | Audit Trail
+   Auth | Navigation | Data Management | Export
 ================================================== */
 
 /* ============================================================
-   AUTH CHECK
-============================================================ */
-if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
-    window.location.href = 'index.html';
-}
+   DEFAULT CUSTOMER DATA
+   Struktur data:
+   {
+     'noInternet': {
+       name: string,
+       city: string,
+       package: string,
+       months: {
+         'Bulan Tahun': { tagihan: number, bayar: boolean, tanggalBayar: number }
+       }
+     }
+   }
 
-/* ============================================================
-   MOCK DATA – Initial seed (mirrors customer-facing data)
-   Setiap bulan sekarang menyimpan: tagihan, bayar, tanggalBayar
-   Rumus Poin:
-     - Tagihan / 100.000 = base
+   Rumus poin:
+     Tagihan / 100.000 = base
      - Tanggal 1-10  → base x 3
      - Tanggal 11-15 → base x 2
      - Tanggal 16-20 → base x 1
      - Tanggal > 20 atau belum bayar → 0
    1 Kupon = 3 Poin
 ============================================================ */
+
 const DEFAULT_CUSTOMERS = {
     '1234567890': {
         name: 'Ahmad Fauzi',
@@ -31,16 +35,6 @@ const DEFAULT_CUSTOMERS = {
             'April 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 5 },
             'Mei 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 8 },
             'Juni 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 3 }
-        }
-    },
-    '0987654321': {
-        name: 'Siti Rahmawati',
-        city: 'Balikpapan',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 750000, bayar: true, tanggalBayar: 12 },
-            'Mei 2025': { tagihan: 750000, bayar: true, tanggalBayar: 7 },
-            'Juni 2025': { tagihan: 750000, bayar: false, tanggalBayar: 0 }
         }
     },
     '1122334455': {
@@ -154,16 +148,9 @@ function savePeriods(data) {
     localStorage.setItem('adminPeriods', JSON.stringify(data));
 }
 
-function loadLogs() {
-    return JSON.parse(localStorage.getItem('adminLogs') || '[]');
-}
-
-function saveLogs(data) {
-    localStorage.setItem('adminLogs', JSON.stringify(data));
-}
-
 function addLog(type, action, detail) {
-    const logs = loadLogs();
+    // Log kept for internal tracking but no UI
+    const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
     logs.unshift({
         time: new Date().toLocaleString('id-ID'),
         type,
@@ -171,15 +158,15 @@ function addLog(type, action, detail) {
         detail
     });
     if (logs.length > 200) logs.length = 200;
-    saveLogs(logs);
+    localStorage.setItem('adminLogs', JSON.stringify(logs));
 }
 
 /* ============================================================
    HELPERS – POINT CALCULATION
    Tagihan / 100.000 = base
-   Tgl 1-10  → base × 3
-   Tgl 11-15 → base × 2
-   Tgl 16-20 → base × 1
+   Tgl 1-10  → base x 3
+   Tgl 11-15 → base x 2
+   Tgl 16-20 → base x 1
    Tgl > 20 / belum bayar → 0
    1 Kupon = 3 Poin
 ============================================================ */
@@ -260,11 +247,8 @@ const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 const SECTION_TITLES = {
     'overview': 'Overview',
-    'pelanggan': 'Data Pelanggan & Poin',
-    'top-customer': 'Top Customer',
-    'laporan': 'Laporan & Export',
-    'pengaturan': 'Pengaturan',
-    'log': 'Log Aktivitas'
+    'pelanggan': 'Data Pelanggan',
+    'pengaturan': 'Pengaturan'
 };
 
 function navigateTo(sectionId) {
@@ -312,10 +296,7 @@ function refreshSection(sectionId) {
     switch (sectionId) {
         case 'overview': renderOverview(customers); break;
         case 'pelanggan': renderCustomerTable(customers); break;
-        case 'top-customer': renderRankingTable(customers); break;
-        case 'laporan': populateExportFilters(customers); break;
         case 'pengaturan': renderSettings(); break;
-        case 'log': renderLogs(); break;
     }
 }
 
@@ -327,67 +308,24 @@ function renderOverview(customers) {
     const totalCustomers = entries.length;
     let totalPoin = 0;
     let totalKupon = 0;
-    const cityPoints = {};
 
     entries.forEach(([no, cust]) => {
         const p = getTotalPoin(cust);
         const k = getTotalKupon(cust);
         totalPoin += p;
         totalKupon += k;
-        if (!cityPoints[cust.city]) cityPoints[cust.city] = 0;
-        cityPoints[cust.city] += p;
     });
 
     document.getElementById('statCustomers').textContent = totalCustomers.toLocaleString('id-ID');
     document.getElementById('statPoints').textContent = totalPoin.toLocaleString('id-ID');
     document.getElementById('statCoupons').textContent = totalKupon.toLocaleString('id-ID');
-
-    const searches = parseInt(localStorage.getItem('cekPoinCount') || '0');
-    document.getElementById('statSearches').textContent = searches.toLocaleString('id-ID');
-
-    renderBarChart('chartCity', cityPoints);
-
-    const cityCoupons = {};
-    entries.forEach(([no, cust]) => {
-        if (!cityCoupons[cust.city]) cityCoupons[cust.city] = 0;
-        cityCoupons[cust.city] += getTotalKupon(cust);
-    });
-    renderBarChart('chartCoupon', cityCoupons);
-}
-
-function renderBarChart(containerId, dataObj) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = '';
-
-    const entries = Object.entries(dataObj).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    const maxVal = Math.max(...entries.map(e => e[1]), 1);
-
-    entries.forEach(([label, val]) => {
-        const pct = (val / maxVal) * 100;
-        const item = document.createElement('div');
-        item.className = 'bar-item';
-        item.innerHTML = `
-            <div class="bar-value">${val.toLocaleString('id-ID')}</div>
-            <div class="bar-fill" style="height: 0%;" data-height="${pct}"></div>
-            <div class="bar-label">${label}</div>
-        `;
-        container.appendChild(item);
-    });
-
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            container.querySelectorAll('.bar-fill').forEach(bar => {
-                bar.style.height = bar.dataset.height + '%';
-            });
-        }, 100);
-    });
 }
 
 /* ============================================================
    DATA PELANGGAN TABLE
 ============================================================ */
 let currentSearchFilter = '';
+let currentCityFilter = 'all';
 let currentSortField = 'poin';
 let currentSortDir = 'desc';
 
@@ -398,12 +336,20 @@ function renderCustomerTable(customers, filter = '') {
     const entries = Object.entries(customers);
     let filtered = entries;
 
+    // Text search filter
     if (filter) {
         const q = filter.toLowerCase();
-        filtered = entries.filter(([no, c]) =>
+        filtered = filtered.filter(([no, c]) =>
             c.name.toLowerCase().includes(q) ||
             no.includes(q) ||
             c.city.toLowerCase().includes(q)
+        );
+    }
+
+    // City/Witel filter
+    if (currentCityFilter !== 'all') {
+        filtered = filtered.filter(([no, c]) =>
+            c.city.toLowerCase() === currentCityFilter.toLowerCase()
         );
     }
 
@@ -419,7 +365,7 @@ function renderCustomerTable(customers, filter = '') {
     }
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 30px; color: var(--text-muted);">
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">
             <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
             Tidak ada data pelanggan ditemukan.</td></tr>`;
         return;
@@ -434,42 +380,29 @@ function renderCustomerTable(customers, filter = '') {
             <td><strong>${c.name}</strong></td>
             <td style="color: var(--text-secondary);">${no}</td>
             <td>${c.city}</td>
-            <td style="font-size: 0.8rem; color: var(--text-secondary);">${c.package}</td>
             <td style="color: var(--accent-yellow); font-weight: 700;">${poin.toLocaleString('id-ID')}</td>
             <td><span class="badge badge-info">${kupon}</span></td>
             <td>
-                <div class="btn-group">
-                    <button class="btn btn-outline btn-sm" onclick="showDetail('${no}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCustomer('${no}')">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
+                <button class="btn btn-outline btn-sm" onclick="showDetail('${no}')">
+                    <i class="fas fa-eye"></i>
+                </button>
             </td>
         </tr>`;
     }).join('');
-}
-
-function deleteCustomer(no) {
-    const customers = loadCustomers();
-    const cust = customers[no];
-    if (!cust) return;
-
-    if (!confirm(`Yakin ingin menghapus pelanggan "${cust.name}" (${no})?`)) return;
-
-    delete customers[no];
-    saveCustomers(customers);
-
-    addLog('edit', 'Hapus Pelanggan', `Pelanggan ${cust.name} (${no}) berhasil dihapus.`);
-    showToast('success', `Pelanggan "${cust.name}" berhasil dihapus.`);
-    renderCustomerTable(loadCustomers(), currentSearchFilter);
 }
 
 const customerSearch = document.getElementById('customerSearch');
 if (customerSearch) {
     customerSearch.addEventListener('input', (e) => {
         currentSearchFilter = e.target.value.trim();
+        renderCustomerTable(loadCustomers(), currentSearchFilter);
+    });
+}
+
+const customerCityFilter = document.getElementById('customerCityFilter');
+if (customerCityFilter) {
+    customerCityFilter.addEventListener('change', (e) => {
+        currentCityFilter = e.target.value;
         renderCustomerTable(loadCustomers(), currentSearchFilter);
     });
 }
@@ -528,360 +461,17 @@ function showDetail(no) {
     openModal('detailModal');
 }
 
-
-
 /* ============================================================
-   IMPORT EXCEL
+   EXPORT TO EXCEL
 ============================================================ */
-let importedData = [];
-
-const fileInput = document.getElementById('fileInput');
-const uploadZone = document.getElementById('uploadZone');
-
-if (uploadZone) {
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('dragover');
-    });
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('dragover');
-    });
-    uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) {
-            handleFile(e.dataTransfer.files[0]);
-        }
-    });
-}
-
-if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            handleFile(e.target.files[0]);
-        }
-    });
-}
-
-function handleFile(file) {
-    const validExts = ['.xlsx', '.xls', '.csv'];
-    const ext = '.' + file.name.split('.').pop().toLowerCase();
-
-    if (!validExts.includes(ext)) {
-        showToast('error', 'Format file tidak valid. Gunakan .xlsx, .xls, atau .csv');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-            if (json.length === 0) {
-                showToast('error', 'File kosong atau format tidak sesuai.');
-                return;
-            }
-            processImportData(json);
-        } catch (err) {
-            showToast('error', 'Gagal membaca file: ' + err.message);
-        }
-    };
-    reader.readAsArrayBuffer(file);
-}
-
-function processImportData(json) {
-    importedData = [];
-    let errorCount = 0;
-    let successCount = 0;
-
-    json.forEach((row) => {
-        const nama = (row.nama || row.Nama || row.NAMA || '').toString().trim();
-        const noInternet = (row.no_internet || row['No Internet'] || row.NO_INTERNET || '').toString().trim();
-        const kota = (row.kota || row.Kota || row.KOTA || '').toString().trim();
-        const paket = (row.paket || row.Paket || row.PAKET || '').toString().trim();
-        const bulan = (row.bulan || row.Bulan || row.BULAN || '').toString().trim();
-        const tagihan = parseInt(row.tagihan || row.Tagihan || row.TAGIHAN || 0);
-        const tanggalBayar = parseInt(row.tanggal_bayar || row['Tanggal Bayar'] || row.TANGGAL_BAYAR || 0);
-        const statusRaw = (row.status_bayar || row['Status Bayar'] || row.STATUS_BAYAR || '').toString().trim().toLowerCase();
-        const bayar = statusRaw === 'lunas' || statusRaw === 'ya' || statusRaw === 'true' || statusRaw === '1';
-
-        let hasError = false;
-        let errorMsg = '';
-
-        if (!nama) { hasError = true; errorMsg = 'Nama kosong'; }
-        if (!noInternet) { hasError = true; errorMsg = 'No Internet kosong'; }
-        if (!bulan) { hasError = true; errorMsg = 'Bulan kosong'; }
-        if (!tagihan || tagihan <= 0) { hasError = true; errorMsg = 'Tagihan tidak valid'; }
-
-        if (hasError) errorCount++;
-        else successCount++;
-
-        importedData.push({
-            nama, noInternet, kota, paket, bulan, tagihan, tanggalBayar, bayar,
-            hasError, errorMsg
-        });
-    });
-
-    const previewStats = document.getElementById('previewStats');
-    previewStats.innerHTML = `
-        <div class="preview-stat total"><i class="fas fa-list"></i> Total: ${importedData.length}</div>
-        <div class="preview-stat success"><i class="fas fa-check"></i> Valid: ${successCount}</div>
-        <div class="preview-stat error"><i class="fas fa-times"></i> Error: ${errorCount}</div>
-    `;
-
-    const previewBody = document.getElementById('previewBody');
-    previewBody.innerHTML = importedData.map((row, idx) => {
-        const rowClass = row.hasError ? 'row-error' : '';
-        return `
-        <tr class="${rowClass}">
-            <td>${idx + 1}${row.hasError ? ' <i class="fas fa-exclamation-circle" title="' + row.errorMsg + '" style="color:var(--accent-red);"></i>' : ''}</td>
-            <td>${row.nama || '-'}</td>
-            <td>${row.noInternet || '-'}</td>
-            <td>${row.kota || '-'}</td>
-            <td>${row.paket || '-'}</td>
-            <td>${row.bulan || '-'}</td>
-            <td>${row.tagihan > 0 ? 'Rp ' + formatRp(row.tagihan) : '-'}</td>
-            <td>${row.tanggalBayar > 0 ? 'Tgl ' + row.tanggalBayar + ' (' + getMultiplierLabel(row.tanggalBayar) + ')' : '-'}</td>
-            <td>${row.hasError ? '<span class="badge badge-danger">' + row.errorMsg + '</span>' : (row.bayar ? '<span class="badge badge-success">Lunas</span>' : '<span class="badge badge-danger">Belum</span>')}</td>
-        </tr>`;
-    }).join('');
-
-    document.getElementById('importPreview').style.display = 'block';
-    showToast('info', `File berhasil dibaca. ${successCount} data valid, ${errorCount} error.`);
-}
-
-function confirmImport() {
-    const validRows = importedData.filter(r => !r.hasError);
-    if (validRows.length === 0) {
-        showToast('error', 'Tidak ada data valid untuk diimport.');
-        return;
-    }
-
-    const customers = loadCustomers();
-
-    validRows.forEach(row => {
-        if (!customers[row.noInternet]) {
-            customers[row.noInternet] = {
-                name: row.nama,
-                city: row.kota,
-                package: row.paket,
-                months: {}
-            };
-        }
-        customers[row.noInternet].name = row.nama;
-        customers[row.noInternet].city = row.kota;
-        if (row.paket) customers[row.noInternet].package = row.paket;
-
-        customers[row.noInternet].months[row.bulan] = {
-            tagihan: row.tagihan,
-            bayar: row.bayar,
-            tanggalBayar: row.tanggalBayar || 0
-        };
-    });
-
-    saveCustomers(customers);
-
-    addLog('upload', 'Import Data Excel',
-        `Berhasil mengimport ${validRows.length} baris data tagihan.`);
-
-    document.getElementById('importPreview').style.display = 'none';
-    importedData = [];
-    if (fileInput) fileInput.value = '';
-
-    showToast('success', `${validRows.length} data berhasil diimport!`);
-    renderCustomerTable(loadCustomers(), currentSearchFilter);
-}
-
-function cancelImport() {
-    document.getElementById('importPreview').style.display = 'none';
-    importedData = [];
-    if (fileInput) fileInput.value = '';
-}
-
-function showTemplateInfo() {
-    openModal('templateModal');
-}
-
-function downloadTemplate() {
-    const templateData = [
-        { nama: 'Contoh Nama', no_internet: '1234567890', kota: 'Banjarmasin', paket: 'IndiBiz High Speed 100Mbps', bulan: 'April 2025', tagihan: 1250000, tanggal_bayar: 5, status_bayar: 'Lunas' },
-        { nama: 'Contoh Lain', no_internet: '0987654321', kota: 'Balikpapan', paket: 'IndiBiz Basic 50Mbps', bulan: 'April 2025', tagihan: 750000, tanggal_bayar: 18, status_bayar: 'Lunas' }
-    ];
-
-    const ws = XLSX.utils.json_to_sheet(templateData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Template');
-    XLSX.writeFile(wb, 'Template_Import_IndiBiz.xlsx');
-
-    addLog('export', 'Download Template', 'Admin mendownload template Excel.');
-    showToast('success', 'Template berhasil diunduh!');
-}
-
-/* ============================================================
-   TOP CUSTOMER / RANKING
-============================================================ */
-function renderRankingTable(customers) {
-    const tbody = document.getElementById('rankingTableBody');
-    if (!tbody) return;
-
-    const entries = Object.entries(customers);
-    const ranked = entries.map(([no, c]) => ({
-        no,
-        name: c.name,
-        city: c.city,
-        poin: getTotalPoin(c),
-        kupon: getTotalKupon(c)
-    })).sort((a, b) => b.poin - a.poin);
-
-    tbody.innerHTML = ranked.map((c, idx) => {
-        const rank = idx + 1;
-        let rankClass = 'rank-default';
-        if (rank === 1) rankClass = 'rank-1';
-        else if (rank === 2) rankClass = 'rank-2';
-        else if (rank === 3) rankClass = 'rank-3';
-
-        return `
-        <tr>
-            <td><span class="rank-num ${rankClass}">${rank}</span></td>
-            <td><strong>${c.name}</strong></td>
-            <td class="name-censored">${censorName(c.name)}</td>
-            <td style="color: var(--text-secondary);">${c.no}</td>
-            <td>${c.city}</td>
-            <td style="color: var(--accent-yellow); font-weight: 700;">${c.poin.toLocaleString('id-ID')}</td>
-            <td><span class="badge badge-info">${c.kupon}</span></td>
-        </tr>`;
-    }).join('');
-
-    updatePublishStatus();
-}
-
-function updatePublishStatus() {
-    const lastPublish = localStorage.getItem('lastPublishTime');
-    const statusEl = document.getElementById('publishStatus');
-    const textEl = document.getElementById('publishStatusText');
-
-    if (lastPublish) {
-        statusEl.classList.remove('unpublished');
-        textEl.innerHTML = `<i class="fas fa-check-circle"></i> Terakhir di-publish: ${lastPublish}`;
-    } else {
-        statusEl.classList.add('unpublished');
-        textEl.textContent = 'Data belum dipublish ke halaman pelanggan.';
-    }
-}
-
-function publishRanking() {
-    const customers = loadCustomers();
-    const entries = Object.entries(customers);
-
-    const ranked = entries.map(([no, c]) => ({
-        no,
-        name: c.name,
-        censoredName: censorName(c.name),
-        city: c.city,
-        poin: getTotalPoin(c),
-        kupon: getTotalKupon(c)
-    })).sort((a, b) => b.poin - a.poin);
-
-    localStorage.setItem('publishedRanking', JSON.stringify(ranked));
-    localStorage.setItem('publishedCustomers', JSON.stringify(customers));
-
-    const now = new Date().toLocaleString('id-ID');
-    localStorage.setItem('lastPublishTime', now);
-
-    addLog('publish', 'Publish Ranking', `Data ranking (${ranked.length} pelanggan) berhasil di-publish ke website.`);
-    updatePublishStatus();
-    showToast('success', 'Data Top Customer berhasil di-publish ke halaman pelanggan!');
-}
-
-/* ============================================================
-   LAPORAN & EXPORT
-============================================================ */
-function populateExportFilters(customers) {
-    const citySelect = document.getElementById('exportCityFilter');
-    if (!citySelect) return;
-
-    const cities = new Set();
-    Object.values(customers).forEach(c => cities.add(c.city));
-
-    citySelect.innerHTML = '<option value="all">Semua Kota</option>';
-    [...cities].sort().forEach(city => {
-        citySelect.innerHTML += `<option value="${city}">${city}</option>`;
-    });
-
-    // Hide preview on section load
-    const preview = document.getElementById('reportPreview');
-    if (preview) preview.style.display = 'none';
-}
-
-/* --- Preview Report (Tampilkan) --- */
-function previewReport() {
-    const customers = loadCustomers();
-    const cityFilter = document.getElementById('exportCityFilter').value;
-    const limitFilter = document.getElementById('exportLimitFilter').value;
-
-    const entries = Object.entries(customers)
-        .filter(([no, c]) => cityFilter === 'all' || c.city === cityFilter)
-        .map(([no, c]) => ({
-            no, ...c,
-            totalPoin: getTotalPoin(c),
-            totalKupon: getTotalKupon(c)
-        }))
-        .sort((a, b) => b.totalPoin - a.totalPoin);
-
-    const limited = limitFilter === 'all' ? entries : entries.slice(0, parseInt(limitFilter));
-
-    if (limited.length === 0) {
-        showToast('error', 'Tidak ada data yang sesuai filter.');
-        return;
-    }
-
-    // Build table
-    const thead = document.getElementById('reportPreviewHead');
-    const tbody = document.getElementById('reportPreviewBody');
-    const countEl = document.getElementById('reportPreviewCount');
-
-    thead.innerHTML = `<tr>
-        <th>No</th>
-        <th>Nama Customer</th>
-        <th>No Internet</th>
-        <th>Kota</th>
-        <th>Paket</th>
-        <th>Total Poin</th>
-        <th>Kupon</th>
-    </tr>`;
-
-    tbody.innerHTML = limited.map((c, idx) => `
-        <tr>
-            <td>${idx + 1}</td>
-            <td><strong>${c.name}</strong></td>
-            <td style="color: var(--text-secondary);">${c.no}</td>
-            <td>${c.city}</td>
-            <td style="font-size: 0.8rem; color: var(--text-secondary);">${c.package}</td>
-            <td style="color: var(--accent-yellow); font-weight: 700;">${c.totalPoin.toLocaleString('id-ID')}</td>
-            <td><span class="badge badge-info">${c.totalKupon}</span></td>
-        </tr>
-    `).join('');
-
-    countEl.textContent = `Menampilkan ${limited.length} dari ${entries.length} data`;
-
-    document.getElementById('reportPreview').style.display = 'block';
-    showToast('success', `${limited.length} data ditampilkan.`);
-}
-
 function exportToExcel(type) {
     const customers = loadCustomers();
-    const cityFilter = document.getElementById('exportCityFilter').value;
-    const limitFilter = document.getElementById('exportLimitFilter').value;
 
     let data = [];
     let filename = '';
 
     if (type === 'full') {
         const entries = Object.entries(customers)
-            .filter(([no, c]) => cityFilter === 'all' || c.city === cityFilter)
             .map(([no, c]) => ({
                 no, ...c,
                 totalPoin: getTotalPoin(c),
@@ -889,9 +479,11 @@ function exportToExcel(type) {
             }))
             .sort((a, b) => b.totalPoin - a.totalPoin);
 
-        const limited = limitFilter === 'all' ? entries : entries.slice(0, parseInt(limitFilter));
+        // Apply city filter if active
+        const filtered = currentCityFilter === 'all' ? entries :
+            entries.filter(c => c.city.toLowerCase() === currentCityFilter.toLowerCase());
 
-        data = limited.map((c, idx) => {
+        data = filtered.map((c, idx) => {
             const row = {
                 'No': idx + 1,
                 'Nama Customer': c.name,
@@ -914,16 +506,17 @@ function exportToExcel(type) {
 
     } else if (type === 'ranking') {
         const entries = Object.entries(customers)
-            .filter(([no, c]) => cityFilter === 'all' || c.city === cityFilter)
             .map(([no, c]) => ({
                 no, name: c.name, city: c.city,
                 poin: getTotalPoin(c), kupon: getTotalKupon(c)
             }))
             .sort((a, b) => b.poin - a.poin);
 
-        const limited = limitFilter === 'all' ? entries : entries.slice(0, parseInt(limitFilter));
+        // Apply city filter if active
+        const filtered = currentCityFilter === 'all' ? entries :
+            entries.filter(c => c.city.toLowerCase() === currentCityFilter.toLowerCase());
 
-        data = limited.map((c, idx) => ({
+        data = filtered.map((c, idx) => ({
             'Rank': idx + 1,
             'Nama Customer': c.name,
             'Nama Sensor': censorName(c.name),
@@ -934,17 +527,6 @@ function exportToExcel(type) {
         }));
 
         filename = `Top_Customer_IndiBiz_${new Date().toISOString().split('T')[0]}.xlsx`;
-
-    } else if (type === 'log') {
-        const logs = loadLogs();
-        data = logs.map((log, idx) => ({
-            'No': idx + 1,
-            'Waktu': log.time,
-            'Tipe': log.type,
-            'Aktivitas': log.action,
-            'Detail': log.detail
-        }));
-        filename = `Log_Aktivitas_IndiBiz_${new Date().toISOString().split('T')[0]}.xlsx`;
     }
 
     if (data.length === 0) {
@@ -957,17 +539,16 @@ function exportToExcel(type) {
     XLSX.utils.book_append_sheet(wb, ws, 'Data');
     XLSX.writeFile(wb, filename);
 
-    addLog('export', `Export ${type === 'full' ? 'Data Pelanggan' : type === 'ranking' ? 'Top Customer' : 'Log Aktivitas'}`,
+    addLog('export', `Export ${type === 'full' ? 'Data Pelanggan' : 'Top Customer'}`,
         `Berhasil meng-export ${data.length} baris data ke file ${filename}`);
 
     showToast('success', `File "${filename}" berhasil diunduh!`);
 }
 
 /* ============================================================
-   SETTINGS – BANNER
+   SETTINGS
 ============================================================ */
 function renderSettings() {
-    renderBannerPreview();
     renderPeriodList();
 }
 
@@ -1012,35 +593,6 @@ function changePassword() {
 
     addLog('edit', 'Ganti Password', 'Admin berhasil mengubah password.');
     showToast('success', 'Password berhasil diubah!');
-}
-
-function renderBannerPreview() {
-    const grid = document.getElementById('bannerPreviewGrid');
-    if (!grid) return;
-
-    const banners = [
-        { src: '../images/banner1.png', label: 'Banner 1 – Utama' },
-        { src: '../images/banner2.png', label: 'Banner 2 – Kumpulkan Poin' },
-        { src: '../images/banner3.png', label: 'Banner 3 – Top Customer' }
-    ];
-
-    grid.innerHTML = banners.map(b => `
-        <div class="banner-preview-item">
-            <img src="${b.src}" alt="${b.label}">
-            <div class="banner-label">${b.label}</div>
-        </div>
-    `).join('');
-}
-
-const bannerUploadInput = document.getElementById('bannerUploadInput');
-if (bannerUploadInput) {
-    bannerUploadInput.addEventListener('change', (e) => {
-        if (e.target.files.length) {
-            addLog('upload', 'Upload Banner', `Banner baru "${e.target.files[0].name}" berhasil diupload.`);
-            showToast('info', 'Banner berhasil diupload! (Demo mode – Hubungi Backend untuk integrasi penuh)');
-            e.target.value = '';
-        }
-    });
 }
 
 /* ============================================================
@@ -1098,52 +650,6 @@ function createNewPeriod() {
     closeModal('periodModal');
     showToast('success', `Periode "${name}" berhasil dibuat!`);
     renderPeriodList();
-}
-
-/* ============================================================
-   LOG AKTIVITAS
-============================================================ */
-function renderLogs() {
-    const tbody = document.getElementById('logTableBody');
-    if (!tbody) return;
-
-    const logs = loadLogs();
-
-    if (logs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 30px; color: var(--text-muted);">
-            <i class="fas fa-clipboard-list" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
-            Belum ada aktivitas tercatat.</td></tr>`;
-        return;
-    }
-
-    const typeIcons = {
-        'login': { icon: 'fas fa-sign-in-alt', class: 'log-login' },
-        'upload': { icon: 'fas fa-file-upload', class: 'log-upload' },
-        'edit': { icon: 'fas fa-edit', class: 'log-edit' },
-        'publish': { icon: 'fas fa-globe', class: 'log-publish' },
-        'export': { icon: 'fas fa-download', class: 'log-export' },
-        'period': { icon: 'fas fa-calendar', class: 'log-period' }
-    };
-
-    tbody.innerHTML = logs.map(log => {
-        const ti = typeIcons[log.type] || { icon: 'fas fa-info-circle', class: 'log-login' };
-        return `
-        <tr>
-            <td><span class="log-entry-icon ${ti.class}"><i class="${ti.icon}"></i></span></td>
-            <td style="white-space:nowrap; color: var(--text-secondary);">${log.time}</td>
-            <td><strong>${log.action}</strong></td>
-            <td style="color: var(--text-secondary); font-size: 0.82rem;">${log.detail}</td>
-        </tr>`;
-    }).join('');
-}
-
-function clearLogs() {
-    if (confirm('Yakin ingin menghapus semua log aktivitas?')) {
-        saveLogs([]);
-        addLog('edit', 'Hapus Log', 'Semua log aktivitas berhasil dihapus.');
-        renderLogs();
-        showToast('success', 'Log aktivitas berhasil dihapus.');
-    }
 }
 
 /* ============================================================
@@ -1205,7 +711,7 @@ function showToast(type, message) {
    INIT
 ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    // Reset mock data if format is old (missing tanggalBayar or still has CV/PT names)
+    // Reset mock data if format is old
     const stored = localStorage.getItem('adminCustomers');
     if (stored) {
         const data = JSON.parse(stored);
