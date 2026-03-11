@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengundian Berhadiah – IndiBiz Borneo 2026</title>
+    <meta name="description"
+        content="Program Undian IndiBiz Borneo - Kumpulkan poin dan menangkan hadiah menarik untuk pelanggan setia IndiBiz">
+    <title>Undian IndiBiz Borneo 2025 - Raih Hadiah Impianmu</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -12,136 +14,405 @@
 </head>
 
 <body>
-    <!-- Floating Particles -->
-    <div class="particles-container" id="particles"></div>
 
-    <!-- ========== MAIN LOTTERY SECTION ========== -->
-    <section class="lottery-section" id="lotterySection">
-        <!-- PCX 160 Background Image -->
-        <div class="vario-bg" id="varioBg">
-            <img src="images/pcx 160 .webp" alt="Honda PCX 160">
-        </div>
-
-        <!-- Logos -->
-        <div class="lottery-logos">
-            <img src="images/Telkom_Indonesia_logo.png" alt="Telkom Indonesia" class="partner-logo telkom">
-            <img src="images/logo.png" alt="IndiBiz" class="lottery-logo">
-            <img src="images/Danantara_Indonesia.png" alt="Danantara Indonesia" class="partner-logo danantara">
-        </div>
-
-        <!-- Title -->
-        <div class="lottery-header">
-            <h1 class="lottery-title">
-                <span class="title-line1">Apresiasi Bayar Tagihan</span>
-                <span class="title-line3">Pelanggan Smart, Bayar Cepat, Rezeki Hebat</span>
-                <span class="title-line2">IndiBiz Borneo 2026</span>
-            </h1>
-            <p class="lottery-subtitle"><i class="fas fa-trophy"></i> Grand Prize: Honda PCX 160 <i
-                    class="fas fa-trophy"></i></p>
-        </div>
-
-        <!-- Decorative Ornaments - More Festive -->
-        <div class="ornament ornament-star ornament-tl"><i class="fas fa-star"></i></div>
-        <div class="ornament ornament-star ornament-tr"><i class="fas fa-star"></i></div>
-        <div class="ornament ornament-sparkle ornament-bl"><i class="fas fa-sparkles"></i></div>
-        <div class="ornament ornament-sparkle ornament-br"><i class="fas fa-sparkles"></i></div>
-        <div class="ornament ornament-gift ornament-ml"><i class="fas fa-gift"></i></div>
-        <div class="ornament ornament-gift ornament-mr"><i class="fas fa-gift"></i></div>
-        <!-- Additional festive ornaments -->
-        <div class="ornament ornament-ribbon ornament-tl2"><i class="fas fa-ribbon"></i></div>
-        <div class="ornament ornament-ribbon ornament-tr2"><i class="fas fa-ribbon"></i></div>
-        <div class="ornament ornament-confetti ornament-bl2"><i class="fas fa-confetti"></i></div>
-        <div class="ornament ornament-confetti ornament-br2"><i class="fas fa-confetti"></i></div>
-        <div class="ornament ornament-medal ornament-ml2"><i class="fas fa-medal"></i></div>
-        <div class="ornament ornament-medal ornament-mr2"><i class="fas fa-medal"></i></div>
-        <div class="ornament ornament-crown ornament-tc"><i class="fas fa-crown"></i></div>
-        <div class="ornament ornament-burst ornament-bc"><i class="fas fa-certificate"></i></div>
-        <div class="ornament ornament-balloon ornament-tl3"><i class="fas fa-champagne-glasses"></i></div>
-        <div class="ornament ornament-balloon ornament-tr3"><i class="fas fa-party-horn"></i></div>
-        <div class="ornament ornament-star2 ornament-ml3"><i class="fas fa-star-half-stroke"></i></div>
-        <div class="ornament ornament-star2 ornament-mr3"><i class="fas fa-wand-magic-sparkles"></i></div>
-
-        <!-- Slot Machine Box -->
-        <div class="slot-container" id="slotContainer">
-            <div class="slot-ribbon-left"><i class="fas fa-trophy"></i></div>
-            <div class="slot-ribbon-right"><i class="fas fa-trophy"></i></div>
-            <div class="slot-box" id="slotBox">
-                <div class="slot-reel" id="reel0"><span>1</span></div>
-                <div class="slot-reel" id="reel1"><span>2</span></div>
-                <div class="slot-reel" id="reel2"><span>3</span></div>
-                <div class="slot-reel" id="reel3"><span>4</span></div>
-                <div class="slot-reel" id="reel4"><span>5</span></div>
-                <div class="slot-reel" id="reel5"><span>6</span></div>
-                <div class="slot-reel" id="reel6"><span>7</span></div>
-                <div class="slot-reel" id="reel7"><span>8</span></div>
-                <div class="slot-reel" id="reel8"><span>9</span></div>
-                <div class="slot-reel" id="reel9"><span>0</span></div>
+    <!-- ========== NAVBAR ========== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="images/logo.png" alt="IndiBiz Logo" class="brand-logo">
             </div>
-            <div class="slot-glow"></div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link active" id="nav-home">Home</a></li>
+                <li><a href="#info" class="nav-link" id="nav-info">Info</a></li>
+                <li><a href="#top-customer" class="nav-link" id="nav-top">Top Customer</a></li>
+                <li><a href="#cek-poin" class="nav-link" id="nav-cek">Cek Poin</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
+    </nav>
 
-        <!-- START Button -->
-        <button class="btn-start" id="btnStart" onclick="startLottery()">
-            <i class="fas fa-play"></i>
-            <span>START</span>
-        </button>
+    <!-- ========== HERO / BANNER SLIDER ========== -->
+    <section class="hero" id="home">
+        <div class="slider-container">
+            <div class="slider-wrapper" id="sliderWrapper">
 
-        <!-- STOP Button (hidden initially) -->
-        <button class="btn-stop" id="btnStop" onclick="stopLottery()" style="display:none;">
-            <i class="fas fa-stop"></i>
-            <span>STOP</span>
-        </button>
-
-        <!-- Status Text -->
-        <p class="status-text" id="statusText">Tekan START untuk memulai pengundian</p>
-    </section>
-
-    <!-- ========== WINNER SECTION ========== -->
-    <section class="winner-section" id="winnerSection" style="display:none;">
-        <!-- Confetti Canvas -->
-        <canvas id="confettiCanvas"></canvas>
-
-        <div class="winner-content">
-            <h2 class="winner-title">
-                <i class="fas fa-trophy"></i> PEMENANG UNDIAN <i class="fas fa-trophy"></i>
-            </h2>
-
-            <!-- Winner Slot Display -->
-            <div class="winner-slot-box" id="winnerSlotBox">
-                <!-- Populated by JS -->
-            </div>
-
-            <!-- Winner Info -->
-            <div class="winner-info" id="winnerInfo">
-                <div class="winner-detail">
-                    <span class="winner-label">No Internet:</span>
-                    <span class="winner-value" id="winnerNo">-</span>
+                <!-- Slide 1 -->
+                <div class="slide slide-1 active">
+                    <img src="images/banner1.png" alt="Undian IndiBiz 2025" class="slide-bg-img">
                 </div>
-                <div class="winner-detail">
-                    <span class="winner-label">Nama Lengkap:</span>
-                    <span class="winner-value" id="winnerName">-</span>
-                </div>
-                <div class="winner-detail">
-                    <span class="winner-label">Kota:</span>
-                    <span class="winner-value" id="winnerCity">-</span>
-                </div>
-                <div class="winner-detail">
-                    <span class="winner-label">Total Kupon:</span>
-                    <span class="winner-value" id="winnerKupon">-</span>
-                </div>
-            </div>
 
-            <!-- Action Buttons -->
-            <div class="winner-actions">
-                <button class="btn-valid" onclick="validateWinner()">
-                    <i class="fas fa-check-circle"></i> VALID
-                </button>
-                <button class="btn-selesai" onclick="finishLottery()">
-                    <i class="fas fa-redo"></i> UNDI LAGI
+                <!-- Slide 2 -->
+                <div class="slide slide-2">
+                    <img src="images/banner2.png" alt="Kumpulkan Poin" class="slide-bg-img">
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="slide slide-3">
+                    <img src="images/banner3.png" alt="Top Customer" class="slide-bg-img">
+                </div>
+
+            </div><!-- /.slider-wrapper -->
+
+            <!-- Slider Controls Bar -->
+            <div class="slider-controls">
+                <div class="slider-indicators" id="sliderDots">
+                    <span class="dot active" data-index="0"></span>
+                    <span class="dot" data-index="1"></span>
+                    <span class="dot" data-index="2"></span>
+                </div>
+                <button id="pauseToggle" class="pause-btn" title="Pause/Play Auto-slide">
+                    <i class="fas fa-pause"></i>
                 </button>
             </div>
         </div>
+
+        <!-- Slider Buttons (Moved outside container for fixed position) -->
+        <button class="slider-btn" id="sliderPrev" aria-label="Previous">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slider-btn" id="sliderNext" aria-label="Next">
+            <i class="fas fa-chevron-right"></i>
+        </button>
     </section>
+
+    <!-- ========== INFO SECTION ========== -->
+    <section class="section info-section" id="info">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Apresiasi Bayar Tagihan : <span class="gradient-text">Pelanggan Smart, Bayar
+                        Cepat, Rezeki Hebat</span></h2>
+                <p class="section-desc">Kenali lebih dalam program undian berhadiah khusus pelanggan IndiBiz Regional IV
+                    (Kalimantan)</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Periode Program</h3>
+                    <p>Program berlaku selama <strong>April 2025 – Juni 2025</strong>. Poin dikumulatif setiap bulan
+                        (1 Kupon = 3 Poin).</p>
+                </div>
+
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-coins"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Cara Mendapatkan Poin</h3>
+                    <p>Pembayaran tagihan IndiBiz <strong>lebih awal</strong> menghasilkan poin lebih banyak! Jumlah
+                        poin ditentukan berdasarkan tanggal pembayaran Anda.</p>
+                </div>
+
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-gift"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Hadiah Menarik</h3>
+                    <p>Hadiah utama berupa <strong>MOTOR</strong> untuk pemenang beruntung.</p>
+                </div>
+
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Pengundian Hadiah</h3>
+                    <p>Undian dilakukan di akhir periode Juni 2025. Semakin banyak kupon yang dimiliki, semakin besar
+                        peluang Anda
+                        <strong>memenangkan MOTOR impian!</strong>
+                    </p>
+                </div>
+
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="500">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-wifi"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Syarat & Ketentuan</h3>
+                    <p>Berlaku untuk seluruh pelanggan internet IndiBiz <strong>aktif</strong> yang melakukan pembayaran
+                        sesuai periode program.</p>
+                </div>
+
+                <div class="info-card card-3d" data-aos="fade-up" data-aos-delay="600">
+                    <div class="card-icon-wrap">
+                        <div class="card-icon"><i class="fas fa-headset"></i></div>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <h3>Pusat Bantuan</h3>
+                    <p>Informasi lebih lanjut silakan hubungi kami melalui akun media sosial resmi IndiBiz Borneo yang
+                        tertera pada bagian footer halaman ini.</p>
+                </div>
+            </div>
+
+            <!-- Info Banner CTA -->
+            <div class="info-cta" data-aos="fade-up">
+                <div class="cta-content">
+                    <div class="cta-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="cta-text">
+                        <h3>Kumpulkan Kupon, Menangkan Hadiahnya!</h3>
+                        <p>Raih poin sebanyak-banyaknya dan dapatkan kesempatan memenangkan hadiah utama!</p>
+                    </div>
+                    <a href="#cek-poin" class="btn btn-primary cta-btn">
+                        <i class="fas fa-search"></i> Cek Poin Saya
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TOP CUSTOMER SECTION ========== -->
+    <section class="section top-customer-section" id="top-customer">
+        <div class="particles" id="particles"></div>
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Top <span class="gradient-text">Customer</span></h2>
+                <p class="section-desc">Pelanggan IndiBiz Borneo dengan poin tertinggi berstatus Top Customer – Periode
+                    April 2025 s/d Juni 2025</p>
+            </div>
+
+            <!-- Podium Top 3 -->
+            <div class="podium-container" data-aos="zoom-in">
+                <!-- 2nd Place -->
+                <div class="podium-item podium-2nd">
+                    <div class="podium-avatar">
+                        <img id="podium-img-2"
+                            src="https://ui-avatars.com/api/?name=Bu***+Ra***&background=C0C0C0&color=fff&size=80&bold=true"
+                            alt="2nd">
+                        <div class="podium-rank rank-2"><i class="fas fa-medal"></i> 2</div>
+                    </div>
+                    <div class="podium-info">
+                        <div class="podium-name" id="podium-name-2">Bu*** Ra***</div>
+                        <div class="podium-points"><i class="fas fa-star"></i> 9.850 Poin</div>
+                        <div class="podium-location"><i class="fas fa-map-marker-alt"></i> Balikpapan</div>
+                    </div>
+                    <div class="podium-base h-2nd">2</div>
+                </div>
+
+                <!-- 1st Place -->
+                <div class="podium-item podium-1st">
+                    <div class="crown-animation"><i class="fas fa-crown"></i></div>
+                    <div class="podium-avatar">
+                        <img id="podium-img-1"
+                            src="https://ui-avatars.com/api/?name=An***+Sy***&background=FFD700&color=fff&size=100&bold=true"
+                            alt="1st">
+                        <div class="podium-rank rank-1"><i class="fas fa-crown"></i> 1</div>
+                    </div>
+                    <div class="podium-info">
+                        <div class="podium-name" id="podium-name-1">An*** Sy***</div>
+                        <div class="podium-points"><i class="fas fa-star"></i> 12.540 Poin</div>
+                        <div class="podium-location"><i class="fas fa-map-marker-alt"></i> Banjarmasin</div>
+                    </div>
+                    <div class="podium-base h-1st">1</div>
+                </div>
+
+                <!-- 3rd Place -->
+                <div class="podium-item podium-3rd">
+                    <div class="podium-avatar">
+                        <img id="podium-img-3"
+                            src="https://ui-avatars.com/api/?name=Ch***+Di***&background=CD7F32&color=fff&size=80&bold=true"
+                            alt="3rd">
+                        <div class="podium-rank rank-3"><i class="fas fa-award"></i> 3</div>
+                    </div>
+                    <div class="podium-info">
+                        <div class="podium-name" id="podium-name-3">Ch*** Di***</div>
+                        <div class="podium-points"><i class="fas fa-star"></i> 8.320 Poin</div>
+                        <div class="podium-location"><i class="fas fa-map-marker-alt"></i> Pontianak</div>
+                    </div>
+                    <div class="podium-base h-3rd">3</div>
+                </div>
+            </div>
+
+            <!-- Ranking Table -->
+            <div class="ranking-table-wrap" data-aos="fade-up">
+                <div class="table-header-bar">
+                    <h3><i class="fas fa-list-ol"></i> Ranking Lengkap</h3>
+                    <span class="table-period">Periode: Apr 2025 – Jun 2025</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="ranking-table" id="rankingTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Customer</th>
+                                <th>No. Internet</th>
+                                <th>Kota</th>
+                                <th>Total Poin</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CEK POIN SECTION ========== -->
+    <section class="section cek-poin-section" id="cek-poin">
+        <div class="container">
+            <div class="section-header" data-aos="fade-up">
+                <h2 class="section-title">Cek <span class="gradient-text">Poin Anda</span></h2>
+                <p class="section-desc">Masukkan nomor internet IndiBiz untuk melihat rincian poin Anda</p>
+            </div>
+
+            <!-- Search Form -->
+            <div class="cek-form-container" data-aos="zoom-in">
+                <div class="form-wrapper">
+                    <div class="form-icon-3d">
+                        <div class="cube">
+                            <div class="cube-face front"><i class="fas fa-search"></i></div>
+                            <div class="cube-face back"><i class="fas fa-star"></i></div>
+                            <div class="cube-face top"><i class="fas fa-wifi"></i></div>
+                            <div class="cube-face bottom"><i class="fas fa-trophy"></i></div>
+                            <div class="cube-face left"><i class="fas fa-gift"></i></div>
+                            <div class="cube-face right"><i class="fas fa-coins"></i></div>
+                        </div>
+                    </div>
+                    <h3 class="form-title">Masukkan Nomor Internet</h3>
+                    <div class="search-input-wrap">
+                        <div class="input-icon"><i class="fas fa-wifi"></i></div>
+                        <input type="text" id="noInternetInput" class="search-input" placeholder="Contoh: 1234567890"
+                            maxlength="15" autocomplete="off">
+                        <button class="search-btn" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                            <span>Cek Poin</span>
+                        </button>
+                    </div>
+                    <p class="form-hint"><i class="fas fa-info-circle"></i> Nomor internet dapat ditemukan pada tagihan
+                        IndiBiz Anda</p>
+                </div>
+            </div>
+
+            <!-- Result Container -->
+            <div class="result-container" id="resultContainer" style="display:none;">
+                <!-- Customer Info Card -->
+                <div class="result-header" data-aos="fade-up">
+                    <div class="customer-card">
+                        <div class="customer-avatar" id="customerAvatar">
+                            <img id="avatarImg" src="" alt="Customer">
+                        </div>
+                        <div class="customer-info">
+                            <div class="customer-badge"><i class="fas fa-check-circle"></i> Pelanggan Terverifikasi
+                            </div>
+                            <h3 id="customerName" class="customer-name">-</h3>
+                            <div class="customer-meta">
+                                <span><i class="fas fa-wifi"></i> <span id="customerNo">-</span></span>
+                                <span><i class="fas fa-map-marker-alt"></i> <span id="customerCity">-</span></span>
+                            </div>
+                        </div>
+                        <div class="total-poin-big">
+                            <div class="total-poin-label">Total Poin</div>
+                            <div class="total-poin-value" id="totalPoinDisplay">0</div>
+                            <div class="total-poin-sub">April 2025 – Juni 2025</div>
+                        </div>
+                        <div class="total-kupon-big">
+                            <div class="total-poin-label">Total Kupon Undian</div>
+                            <div class="total-poin-value" id="totalKuponDisplay" style="color: #60a5fa;">0</div>
+                            <div class="total-poin-sub">1 Kupon = 3 Poin</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Points Table -->
+                <div class="points-table-wrap" data-aos="fade-up">
+                    <div class="points-table-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Rincian Poin Per Bulan</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="points-table" id="pointsTable">
+                            <thead>
+                                <tr>
+                                    <th>Bulan</th>
+                                    <th>Status Bayar</th>
+                                    <th>Poin Didapat</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pointsBody">
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="2"><strong>Total</strong></td>
+                                    <td class="total-poin-cell" id="totalPoinTable">0 Poin</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Empty / Error State -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h3>Nomor Tidak Ditemukan</h3>
+                <p id="emptyMessage">Nomor internet yang Anda masukkan tidak terdaftar dalam sistem kami.</p>
+                <button class="btn btn-outline"
+                    onclick="document.getElementById('noInternetInput').value=''; document.getElementById('emptyState').style.display='none';">
+                    <i class="fas fa-redo"></i> Coba Lagi
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-bg"></div>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="images/logo.png" alt="IndiBiz Logo" class="brand-logo-footer">
+                    </div>
+                    <p>Program undian berhadiah khusus pelanggan setia IndiBiz Borneo (Regional IV). Kumpulkan
+                        poin dan raih hadiah impianmu!</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Menu</h4>
+                    <ul>
+                        <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#info"><i class="fas fa-chevron-right"></i> Info Program</a></li>
+                        <li><a href="#top-customer"><i class="fas fa-chevron-right"></i> Top Customer</a></li>
+                        <li><a href="#cek-poin"><i class="fas fa-chevron-right"></i> Cek Poin</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Kontak</h4>
+                    <ul>
+                        <li><a href="https://www.instagram.com/indibiz.borneo" target="_blank"><i
+                                    class="fab fa-instagram"></i> indibiz.borneo</a></li>
+                        <li><a href="https://www.tiktok.com/@indibiz.borneo" target="_blank"><i
+                                    class="fab fa-tiktok"></i> indibiz.borneo</a></li>
+                        <li><a href="https://www.facebook.com/indibiz.borneo" target="_blank"><i
+                                    class="fab fa-facebook"></i> indibiz.borneo</a></li>
+                        <li><i class="fas fa-map-marker-alt"></i> Jl. Letjen MT. Haryono No. 168, Damai, Balikpapan
+                            Kota, Kalimantan Timur 76114</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 IndiBiz – PT. Telkom Indonesia (Persero) Tbk. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="loading-text">Mencari Data...</div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
