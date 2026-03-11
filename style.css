@@ -1428,6 +1428,11 @@ ul {
     color: var(--gold);
 }
 
+.total-row td:first-child {
+    text-align: right;
+}
+
+
 .total-poin-cell {
     color: var(--gold) !important;
     font-size: 1.05rem;
