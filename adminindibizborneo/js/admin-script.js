@@ -99,7 +99,8 @@ document.getElementById('logoutBtn').addEventListener('click', (e) => {
     e.preventDefault();
     addLog('login', 'Logout', 'Admin logout dari dashboard.');
     sessionStorage.removeItem('adminLoggedIn');
-    window.location.href = 'index.html';
+    document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = '';
 });
 
 /* ============================================================
@@ -573,7 +574,7 @@ function showToast(type, message) {
 /* ============================================================
    INIT
 ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
+function initDashboard() {
     fetchOverview();
 
     // Realtime clock
@@ -592,4 +593,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateClock();
     setInterval(updateClock, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Only init dashboard if already logged in
+    if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+        initDashboard();
+    }
 });

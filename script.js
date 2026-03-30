@@ -457,7 +457,7 @@ async function cekPoinFromSupabase(no) {
         // 2. Ambil histori pembayaran
         const { data: pembayaran } = await db
             .from('informasi_pembayaran')
-            .select('periode_tagihan, tagihan, tanggal_bayar, status_bayar')
+            .select('periode_tagihan, tanggal_bayar, status_lunas')
             .eq('no_internet', no)
             .order('periode_tagihan');
 
@@ -505,8 +505,8 @@ function showResultFromSupabase(no, pelanggan, pembayaran, poinData) {
 
     if (pembayaran.length > 0) {
         pembayaran.forEach(p => {
-            const isBayar = p.status_bayar === 'Lunas' || p.status_bayar === 'lunas' || p.status_bayar === true;
-            const poin = isBayar ? calcPoin(p.tagihan || 0, true) : 0;
+            const isBayar = p.status_lunas === true;
+            const poin = isBayar ? calcPoin(pelanggan.nominal_tagihan || 0, true) : 0;
             const badgeClass = isBayar ? 'badge-paid' : 'badge-unpaid';
             const badgeLabel = isBayar ? 'Lunas' : 'Belum Bayar';
             const poinText = poin > 0 ? `<strong style="color:#fcd34d">+${poin}</strong>` : `<span style="color:#f87171">0</span>`;

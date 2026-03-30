@@ -5,15 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Admin Login – IndiBiz Borneo</title>
-    <link rel="stylesheet" href="css/admin-style.css?v=3">
+    <title>Admin – IndiBiz Borneo</title>
+    <link rel="stylesheet" href="css/admin-style.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- SheetJS for Export/Import -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
 <body>
-    <div class="login-page">
+
+    <!-- ========== LOGIN PAGE ========== -->
+    <div class="login-page" id="loginPage">
         <div class="login-card">
             <div class="login-logo">
                 <img src="../images/logo.png" alt="IndiBiz Logo">
@@ -52,13 +56,356 @@
         </div>
     </div>
 
+    <!-- ========== DASHBOARD ========== -->
+    <div class="dashboard-wrapper" id="dashboardPage" style="display: none;">
+
+        <!-- ========== SIDEBAR ========== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="../images/logo.png" alt="IndiBiz Logo">
+                <span>Admin Panel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Menu Utama</div>
+                <a href="#" class="active" data-section="overview">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="#" data-section="pelanggan">
+                    <i class="fas fa-users"></i> Data Pelanggan
+                </a>
+                <div class="nav-section-title">Sistem</div>
+                <a href="#" data-section="pengaturan">
+                    <i class="fas fa-cog"></i> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Sidebar overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <div class="main-content">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div class="topbar-left">
+                    <button class="hamburger-admin" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle">Overview</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="admin-clock" id="adminClock">
+                        <i class="fas fa-clock"></i>
+                        <span id="clockText">--:--:--</span>
+                        <span id="dateText" style="margin-left: 8px; opacity: 0.7;">--/--/----</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- ===================== SECTION: OVERVIEW ===================== -->
+                <div class="page-section active" id="sec-overview">
+                    <!-- Stats (3 cards only, enlarged) -->
+                    <div class="stats-grid stats-grid-3">
+                        <div class="stat-card stat-card-lg blue">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-label">Total Pelanggan</div>
+                            <div class="stat-value" id="statCustomers">0</div>
+                        </div>
+                        <div class="stat-card stat-card-lg green">
+                            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                            <div class="stat-label">Total Poin Beredar</div>
+                            <div class="stat-value" id="statPoints">0</div>
+                        </div>
+                        <div class="stat-card stat-card-lg yellow">
+                            <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                            <div class="stat-label">Total Kupon</div>
+                            <div class="stat-value" id="statCoupons">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: DATA PELANGGAN ===================== -->
+                <div class="page-section" id="sec-pelanggan">
+                    <!-- Customer Data Table -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="fas fa-database"></i> Database Pelanggan</h3>
+                            <div class="panel-header-actions">
+                                <div class="btn-group">
+                                    <button class="btn btn-success btn-sm" onclick="exportToExcel('full')">
+                                        <i class="fas fa-file-excel"></i> Export Data Pelanggan
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="exportToExcel('ranking')">
+                                        <i class="fas fa-trophy"></i> Export Top Customer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-filter-row">
+                            <div class="search-bar">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="customerSearch" placeholder="Cari nama, no internet, kota...">
+                            </div>
+                            <div class="filter-bar">
+                                <label class="filter-label"><i class="fas fa-filter"></i> Witel:</label>
+                                <select class="form-control form-control-sm" id="customerCityFilter">
+                                    <option value="all">Semua Witel</option>
+                                    <optgroup label="Balikpapan">
+                                        <option value="Inner Witel Balikpapan">Inner Witel Balikpapan</option>
+                                        <option value="Paser">Paser</option>
+                                        <option value="Penajam">Penajam</option>
+                                    </optgroup>
+                                    <optgroup label="Kalbar">
+                                        <option value="Pontianak">Pontianak</option>
+                                        <option value="Ketapang">Ketapang</option>
+                                        <option value="Mempawah">Mempawah</option>
+                                        <option value="Sanggau">Sanggau</option>
+                                        <option value="Singkawang">Singkawang</option>
+                                        <option value="Sintang">Sintang</option>
+                                    </optgroup>
+                                    <optgroup label="Kalselteng">
+                                        <option value="Buntok">Buntok</option>
+                                        <option value="Muara Teweh">Muara Teweh</option>
+                                        <option value="Palangkaraya">Palangkaraya</option>
+                                        <option value="Pangkalan Bun">Pangkalan Bun</option>
+                                        <option value="Sampit">Sampit</option>
+                                    </optgroup>
+                                    <optgroup label="Kalsel">
+                                        <option value="Inner Witel Kalsel">Inner Witel Kalsel</option>
+                                        <option value="Banjarbaru">Banjarbaru</option>
+                                        <option value="Batulicin">Batulicin</option>
+                                        <option value="Kandangan">Kandangan</option>
+                                        <option value="Kotabaru">Kotabaru</option>
+                                        <option value="Pelaihari">Pelaihari</option>
+                                        <option value="Tanjung Tabalong">Tanjung Tabalong</option>
+                                    </optgroup>
+                                    <optgroup label="Kaltimtara">
+                                        <option value="Inner Witel Samarinda">Inner Witel Samarinda</option>
+                                        <option value="Bontang">Bontang</option>
+                                        <option value="Tenggarong">Tenggarong</option>
+                                        <option value="Melak">Melak</option>
+                                        <option value="Malinau">Malinau</option>
+                                        <option value="Nunukan">Nunukan</option>
+                                        <option value="Tanjung Redeb">Tanjung Redeb</option>
+                                        <option value="Tanjung Selor">Tanjung Selor</option>
+                                        <option value="Tarakan">Tarakan</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="panel-body no-pad">
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th style="cursor:pointer" onclick="sortCustomerTable('nama')">Nama Customer
+                                                <i class="fas fa-sort"></i>
+                                            </th>
+                                            <th>No Internet</th>
+                                            <th style="cursor:pointer" onclick="sortCustomerTable('kota')">Kota <i
+                                                    class="fas fa-sort"></i></th>
+                                            <th style="cursor:pointer" onclick="sortCustomerTable('poin')">Total Poin <i
+                                                    class="fas fa-sort"></i></th>
+                                            <th style="cursor:pointer" onclick="sortCustomerTable('kupon')">Kupon <i
+                                                    class="fas fa-sort"></i></th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerTableBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===================== SECTION: PENGATURAN ===================== -->
+                <div class="page-section" id="sec-pengaturan">
+                    <!-- Period management -->
+                    <div class="setting-card">
+                        <h4><i class="fas fa-calendar-check"></i> Manajemen Periode Program</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">
+                            Kelola periode program undian. Tutup periode untuk mengarsipkan data poin dan mulai periode
+                            baru.
+                        </p>
+                        <div id="periodList">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div style="margin-top: 14px;">
+                            <button class="btn btn-primary" onclick="openNewPeriodModal()">
+                                <i class="fas fa-plus"></i> Buat Periode Baru
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Password Change -->
+                    <div class="setting-card">
+                        <h4><i class="fas fa-key"></i> Ganti Password Admin</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 14px;">
+                            Ubah password untuk keamanan akun admin dashboard.
+                        </p>
+                        <div style="max-width: 400px;">
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label
+                                    style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:4px;">Password
+                                    Lama</label>
+                                <input type="password" id="currentPassword" placeholder="Masukkan password lama"
+                                    style="width:100%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:0.85rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label
+                                    style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:4px;">Password
+                                    Baru</label>
+                                <input type="password" id="newPassword" placeholder="Minimal 6 karakter"
+                                    style="width:100%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:0.85rem;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 14px;">
+                                <label
+                                    style="display:block; font-size:0.82rem; font-weight:600; margin-bottom:4px;">Konfirmasi
+                                    Password Baru</label>
+                                <input type="password" id="confirmPassword" placeholder="Ulangi password baru"
+                                    style="width:100%; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:0.85rem;">
+                            </div>
+                            <button class="btn btn-primary" onclick="changePassword()">
+                                <i class="fas fa-save"></i> Simpan Password Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALS ========== -->
+
+    <!-- Detail Pelanggan Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-user"></i> <span id="detailModalTitle">Detail Pelanggan</span></h3>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div>
+                        <label class="form-label">Nama</label>
+                        <div id="detailName" style="font-weight: 600; font-size: 0.95rem;">-</div>
+                    </div>
+                    <div>
+                        <label class="form-label">No Internet</label>
+                        <div id="detailNo" style="font-weight: 600; font-size: 0.95rem;">-</div>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-bottom: 20px;">
+                    <div>
+                        <label class="form-label">Kota</label>
+                        <div id="detailCity" style="font-size: 0.9rem;">-</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Paket</label>
+                        <div id="detailPackage" style="font-size: 0.9rem;">-</div>
+                    </div>
+                </div>
+                <h4 style="font-size: 0.9rem; margin-bottom: 12px;"><i class="fas fa-calendar-alt"
+                        style="color: var(--accent-blue);"></i> Rincian Poin Per Bulan</h4>
+                <div class="table-responsive">
+                    <table class="admin-table" id="detailPointsTable">
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Tagihan</th>
+                                <th>Status Bayar</th>
+                                <th>Tgl Bayar</th>
+                                <th>Kalkulasi</th>
+                                <th>Poin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailPointsBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5"><strong>Total</strong></td>
+                                <td id="detailTotalPoin" style="font-weight: 700; color: var(--accent-yellow);">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailModal')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Period Modal -->
+    <div class="modal-overlay" id="periodModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-plus"></i> Buat Periode Baru</h3>
+                <button class="modal-close" onclick="closeModal('periodModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">Nama Periode</label>
+                        <input type="text" class="form-control" id="newPeriodName"
+                            placeholder="Contoh: Periode Juli - September 2025">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="date" class="form-control" id="newPeriodStart">
+                    </div>
+                    <div>
+                        <label class="form-label">Tanggal Akhir</label>
+                        <input type="date" class="form-control" id="newPeriodEnd">
+                    </div>
+                </div>
+                <div
+                    style="background: rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 12px; margin-top: 12px;">
+                    <p style="color: var(--accent-yellow); font-size: 0.82rem;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Perhatian:</strong> Membuat periode baru
+                        akan mengarsipkan periode aktif saat ini. Data poin pelanggan pada periode lama tetap tersimpan
+                        namun tidak aktif.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('periodModal')">Batal</button>
+                <button class="btn btn-primary" onclick="createNewPeriod()">
+                    <i class="fas fa-plus"></i> Buat Periode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Login Logic -->
     <script>
-        // Check if already logged in
-        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-            window.location.href = 'dashboard.html';
+        const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+
+        function checkLogin() {
+            if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboardPage').style.display = 'flex';
+                return true;
+            }
+            return false;
         }
 
-        const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+        // Check on page load
+        checkLogin();
 
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -82,7 +429,12 @@
                 });
                 localStorage.setItem('adminLogs', JSON.stringify(logs));
 
-                window.location.href = 'dashboard.html';
+                // Show dashboard without page reload
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboardPage').style.display = 'flex';
+
+                // Initialize dashboard
+                if (typeof initDashboard === 'function') initDashboard();
             } else {
                 const err = document.getElementById('loginError');
                 err.classList.add('show');
@@ -92,6 +444,10 @@
             }
         });
     </script>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/admin-script.js"></script>
 </body>
 
 </html>
