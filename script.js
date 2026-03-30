@@ -11,65 +11,6 @@ const SUPABASE_KEY = 'sb_publishable_hF0op8sFap54NyZrduW8qg_DMvXo-h8';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============================================================
-   FALLBACK MOCK DATABASE – used when Supabase is empty
-============================================================ */
-const SAMPLE_CUSTOMERS = {
-    '1234567890': {
-        name: 'Andi Syahputra',
-        city: 'Banjarmasin',
-        package: 'IndiBiz High Speed 100Mbps',
-        months: {
-            'April 2025': { tagihan: 1250000, bayar: true },
-            'Mei 2025': { tagihan: 1250000, bayar: true },
-            'Juni 2025': { tagihan: 1250000, bayar: true }
-        }
-    },
-    '0987654321': {
-        name: 'Budi Raharjo',
-        city: 'Balikpapan',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 750000, bayar: true },
-            'Mei 2025': { tagihan: 750000, bayar: true },
-            'Juni 2025': { tagihan: 750000, bayar: false }
-        }
-    },
-    '1122334455': {
-        name: 'Chandra Dimas',
-        city: 'Pontianak',
-        package: 'IndiBiz Pro 200Mbps',
-        months: {
-            'April 2025': { tagihan: 2100000, bayar: true },
-            'Mei 2025': { tagihan: 2100000, bayar: true },
-            'Juni 2025': { tagihan: 2100000, bayar: true }
-        }
-    },
-    '5544332211': {
-        name: 'Dedy Kusuma',
-        city: 'Samarinda',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 750000, bayar: true },
-            'Mei 2025': { tagihan: 750000, bayar: false },
-            'Juni 2025': { tagihan: 750000, bayar: false }
-        }
-    }
-};
-
-const SAMPLE_TOP_CUSTOMERS = [
-    { rank: 1, name: "Andi Syahputra", no: "1234567890", city: "Banjarmasin", points: 12540, status: "top" },
-    { rank: 2, name: "Budi Raharjo", no: "0987654321", city: "Balikpapan", points: 9850, status: "top" },
-    { rank: 3, name: "Chandra Dimas", no: "1122334455", city: "Pontianak", points: 8320, status: "top" },
-    { rank: 4, name: "Dedy Kusuma", no: "5544332211", city: "Samarinda", points: 7100, status: "active" },
-    { rank: 5, name: "Edi Pramono", no: "3344556677", city: "Palangkaraya", points: 6840, status: "active" },
-    { rank: 6, name: "Fifi Lutfia", no: "5566778899", city: "Tarakan", points: 6200, status: "active" },
-    { rank: 7, name: "Gita Maya", no: "4455667788", city: "Singkawang", points: 5980, status: "active" },
-    { rank: 8, name: "Hadi Tanu", no: "6677889900", city: "Bontang", points: 5430, status: "active" },
-    { rank: 9, name: "Irwan Wahyu", no: "7788990011", city: "Banjarbaru", points: 4960, status: "active" },
-    { rank: 10, name: "Junaedi Saputra", no: "8899001122", city: "Tenggarong", points: 4520, status: "active" },
-];
-
-/* ============================================================
    HELPERS
 ============================================================ */
 function calcPoin(tagihan, bayar) {
@@ -325,62 +266,64 @@ function spawnParticles() {
 })();
 
 /* ============================================================
-   RANKING TABLE (Live from Supabase)
+   RANKING TABLE & PODIUM (Supabase)
 ============================================================ */
-let TOP_CUSTOMERS_DATA = []; // will be populated from Supabase
+let topCustomersData = [];
 
-async function populateRanking() {
-    const body = document.getElementById('rankingBody');
-    if (!body) return;
-
+async function loadTopCustomers() {
     try {
-        // Fetch top customers by total_poin descending
+        // Ambil 10 data pelanggan dengan poin tertinggi
         const { data: poinData, error: errPoin } = await db
             .from('poin_dan_kupon')
-            .select('no_internet, total_poin, total_kupon')
+            .select('no_internet, total_poin')
             .order('total_poin', { ascending: false })
             .limit(10);
 
         if (errPoin) throw errPoin;
 
         if (!poinData || poinData.length === 0) {
-            // Fallback to sample data
-            TOP_CUSTOMERS_DATA = SAMPLE_TOP_CUSTOMERS;
-            renderRanking(body, TOP_CUSTOMERS_DATA);
+            console.log('Belum ada data Top Customer');
+            document.getElementById('rankingBody').innerHTML = '<tr><td colspan="6">Belum ada data pelanggan</td></tr>';
             return;
         }
 
-        // Fetch customer names & cities
-        const noList = poinData.map(p => p.no_internet);
-        const { data: pelangganData, error: errP } = await db
+        // Ambil detail nama & kota
+        const noInternetList = poinData.map(p => p.no_internet);
+        const { data: pelangganData, error: errPelanggan } = await db
             .from('data_pelanggan')
             .select('no_internet, nama_pelanggan, kota')
-            .in('no_internet', noList);
+            .in('no_internet', noInternetList);
 
-        if (errP) throw errP;
+        if (errPelanggan) throw errPelanggan;
 
-        const map = {};
-        (pelangganData || []).forEach(p => { map[p.no_internet] = p; });
+        const pelangganMap = {};
+        (pelangganData || []).forEach(p => pelangganMap[p.no_internet] = p);
 
-        TOP_CUSTOMERS_DATA = poinData.map((p, idx) => ({
-            rank: idx + 1,
-            name: map[p.no_internet]?.nama_pelanggan || '-',
-            no: p.no_internet,
-            city: map[p.no_internet]?.kota || '-',
-            points: p.total_poin || 0,
-            status: idx < 3 ? 'top' : 'active'
-        }));
+        // Bentuk array data Top Customers
+        topCustomersData = poinData.map((p, index) => {
+            const detail = pelangganMap[p.no_internet] || {};
+            return {
+                rank: index + 1,
+                name: detail.nama_pelanggan || '-',
+                no: p.no_internet,
+                city: detail.kota || '-',
+                points: p.total_poin || 0,
+                status: index < 3 ? 'top' : 'active'
+            };
+        });
 
-        renderRanking(body, TOP_CUSTOMERS_DATA);
+        populateRanking();
+        updatePodium();
+
     } catch (err) {
-        console.error('Gagal memuat ranking dari Supabase:', err);
-        TOP_CUSTOMERS_DATA = SAMPLE_TOP_CUSTOMERS;
-        renderRanking(body, TOP_CUSTOMERS_DATA);
+        console.error('Gagal memuat Top Customers dari Supabase:', err);
     }
 }
 
-function renderRanking(body, data) {
-    body.innerHTML = data.map(c => {
+function populateRanking() {
+    const body = document.getElementById('rankingBody');
+    if (!body) return;
+    body.innerHTML = topCustomersData.map(c => {
         let rankClass = 'rank-normal';
         if (c.rank === 1) rankClass = 'rank-gold';
         else if (c.rank === 2) rankClass = 'rank-silver';
@@ -392,7 +335,7 @@ function renderRanking(body, data) {
         <tr>
             <td><span class="rank-badge ${rankClass}">${c.rank}</span></td>
             <td><strong>${masked}</strong></td>
-            <td style="color:var(--text-body);font-size:0.85rem;">${c.no}</td>
+            <td style="color:var(--text-body);font-size:0.85rem;">${maskName(c.no)}</td>
             <td>${c.city}</td>
             <td style="color:#fcd34d;font-weight:700;">${c.points.toLocaleString('id-ID')}</td>
             <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
@@ -414,7 +357,7 @@ noInternetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter') doCekPoin();
 });
 
-function doCekPoin() {
+async function doCekPoin() {
     const no = noInternetInput.value.trim();
     if (!no) {
         noInternetInput.focus();
@@ -428,99 +371,81 @@ function doCekPoin() {
     resultContainer.style.display = 'none';
     emptyState.style.display = 'none';
 
-    cekPoinFromSupabase(no);
-}
-
-async function cekPoinFromSupabase(no) {
     try {
-        // 1. Cari pelanggan
-        const { data: pelanggan, error: errP } = await db
+        // Cek data pelanggan
+        const { data: pelanggan, error: errPelanggan } = await db
             .from('data_pelanggan')
             .select('*')
             .eq('no_internet', no)
             .single();
 
-        if (errP || !pelanggan) {
-            // Coba fallback ke sample data
-            const sampleCust = SAMPLE_CUSTOMERS[no];
-            loadingOverlay.classList.remove('active');
-            if (!sampleCust) {
-                emptyState.style.display = 'block';
-                document.getElementById('emptyMessage').textContent =
-                    `Nomor internet "${no}" tidak terdaftar dalam sistem kami. Pastikan nomor yang Anda masukkan benar.`;
-            } else {
-                showResultFromSample(no, sampleCust);
-            }
-            return;
+        if (errPelanggan || !pelanggan) {
+            throw new Error('Pelanggan tidak ditemukan');
         }
 
-        // 2. Ambil histori pembayaran
-        const { data: pembayaran } = await db
-            .from('informasi_pembayaran')
-            .select('periode_tagihan, tanggal_bayar, status_lunas')
-            .eq('no_internet', no)
-            .order('periode_tagihan');
-
-        // 3. Ambil poin & kupon
-        const { data: poinArr } = await db
+        // Cek poin
+        const { data: poin, error: errPoin } = await db
             .from('poin_dan_kupon')
-            .select('total_poin, total_kupon')
-            .eq('no_internet', no);
+            .select('*')
+            .eq('no_internet', no)
+            .single();
 
-        const poinData = poinArr && poinArr.length > 0 ? poinArr[0] : { total_poin: 0, total_kupon: 0 };
+        // Cek pembayaran
+        const { data: pembayaran, error: errPembayaran } = await db
+            .from('informasi_pembayaran')
+            .select('*')
+            .eq('no_internet', no)
+            .single();
 
         loadingOverlay.classList.remove('active');
-        showResultFromSupabase(no, pelanggan, pembayaran || [], poinData);
+        showResult(no, pelanggan, poin || { total_poin: 0, total_kupon: 0 }, pembayaran);
 
     } catch (err) {
         console.error('Error Cek Poin:', err);
         loadingOverlay.classList.remove('active');
-        // Try sample fallback
-        const sampleCust = SAMPLE_CUSTOMERS[no];
-        if (!sampleCust) {
-            emptyState.style.display = 'block';
-            document.getElementById('emptyMessage').textContent =
-                `Terjadi kesalahan saat mencari data. Silakan coba lagi.`;
-        } else {
-            showResultFromSample(no, sampleCust);
-        }
+        emptyState.style.display = 'block';
+        document.getElementById('emptyMessage').textContent =
+            `Nomor internet "${no}" tidak terdaftar dalam sistem kami. Pastikan nomor yang Anda masukkan benar.`;
     }
 }
 
-function showResultFromSupabase(no, pelanggan, pembayaran, poinData) {
+function showResult(no, pelanggan, poin, pembayaran) {
     const maskedName = maskName(pelanggan.nama_pelanggan);
-    const totalPoin = poinData.total_poin || 0;
-    const totalKupon = poinData.total_kupon || 0;
+    const totalPoin = poin.total_poin || 0;
+    const totalKupon = poin.total_kupon || 0;
 
     // Customer info
     document.getElementById('customerName').textContent = maskedName;
-    document.getElementById('customerNo').textContent = no;
+    document.getElementById('customerNo').textContent = maskName(no); // Menyamarkan nomor
     document.getElementById('customerCity').textContent = pelanggan.kota || '-';
     document.getElementById('avatarImg').src =
         `https://ui-avatars.com/api/?name=${encodeURIComponent(maskedName)}&background=1d4ed8&color=fff&size=80&bold=true`;
 
-    // Build monthly table from pembayaran
+    // Build monthly table
     const tbody = document.getElementById('pointsBody');
     tbody.innerHTML = '';
 
-    if (pembayaran.length > 0) {
-        pembayaran.forEach(p => {
-            const isBayar = p.status_lunas === true;
-            const poin = isBayar ? calcPoin(pelanggan.nominal_tagihan || 0, true) : 0;
-            const badgeClass = isBayar ? 'badge-paid' : 'badge-unpaid';
-            const badgeLabel = isBayar ? 'Lunas' : 'Belum Bayar';
-            const poinText = poin > 0 ? `<strong style="color:#fcd34d">+${poin}</strong>` : `<span style="color:#f87171">0</span>`;
+    const months = ['4', '5', '6']; // Merepresentasikan bln_4, bln_5, bln_6
+    const monthNames = ['April 2026', 'Mei 2026', 'Juni 2026'];
 
-            tbody.innerHTML += `
-            <tr>
-                <td>${p.periode_tagihan || '-'}</td>
-                <td><span class="${badgeClass}">${badgeLabel}</span></td>
-                <td>${poinText}</td>
-            </tr>`;
-        });
-    } else {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Belum ada data pembayaran.</td></tr>`;
-    }
+    months.forEach((m, idx) => {
+        const isPaid = pembayaran ? pembayaran[`bln_${m}`] : false;
+        // Asumsi nilai poin jika bayar = 1/3 dari total poin sementara (karena simulasi riwayat)
+        // Jika butuh hitungan akurat dari tagihan, harus ada field tagihan per bulan.
+        // Di sini kita tunjukkan status bayar saja dengan pembagian poin rata 
+        let currentPoin = isPaid ? Math.floor(totalPoin / 3) : 0; 
+
+        const badgeClass = isPaid ? 'badge-paid' : 'badge-unpaid';
+        const badgeLabel = isPaid ? 'Lunas' : 'Belum Bayar';
+        const poinText = currentPoin > 0 ? `<strong style="color:#fcd34d">+${currentPoin}</strong>` : `<span style="color:#f87171">0</span>`;
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${monthNames[idx]}</td>
+            <td><span class="${badgeClass}">${badgeLabel}</span></td>
+            <td>${poinText}</td>
+        </tr>`;
+    });
 
     // Total row
     document.getElementById('totalPoinTable').textContent = `${totalPoin.toLocaleString('id-ID')} Poin`;
@@ -531,50 +456,6 @@ function showResultFromSupabase(no, pelanggan, pembayaran, poinData) {
         animateCounter('totalKuponDisplay', totalKupon);
     }
 
-    resultContainer.style.display = 'block';
-    resultContainer.querySelectorAll('[data-aos]').forEach(el => {
-        el.classList.remove('aos-animate');
-        setTimeout(() => el.classList.add('aos-animate'), 50);
-    });
-    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Fallback: show result from local sample data
-function showResultFromSample(no, cust) {
-    const months = Object.entries(cust.months);
-    let totalPoin = 0;
-    const maskedName = maskName(cust.name);
-
-    document.getElementById('customerName').textContent = maskedName;
-    document.getElementById('customerNo').textContent = no;
-    document.getElementById('customerCity').textContent = cust.city;
-    document.getElementById('avatarImg').src =
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(maskedName)}&background=1d4ed8&color=fff&size=80&bold=true`;
-
-    const tbody = document.getElementById('pointsBody');
-    tbody.innerHTML = '';
-
-    months.forEach(([bulan, data]) => {
-        const poin = calcPoin(data.tagihan, data.bayar);
-        totalPoin += poin;
-        const badgeClass = data.bayar ? 'badge-paid' : 'badge-unpaid';
-        const badgeLabel = data.bayar ? 'Lunas' : 'Belum Bayar';
-        const poinText = poin > 0 ? `<strong style="color:#fcd34d">+${poin}</strong>` : `<span style="color:#f87171">0</span>`;
-
-        tbody.innerHTML += `
-        <tr>
-            <td>${bulan}</td>
-            <td><span class="${badgeClass}">${badgeLabel}</span></td>
-            <td>${poinText}</td>
-        </tr>`;
-    });
-
-    document.getElementById('totalPoinTable').textContent = `${totalPoin.toLocaleString('id-ID')} Poin`;
-    const totalKupon = Math.floor(totalPoin / 3);
-    animateCounter('totalPoinDisplay', totalPoin);
-    if (document.getElementById('totalKuponDisplay')) {
-        animateCounter('totalKuponDisplay', totalKupon);
-    }
 
     resultContainer.style.display = 'block';
     resultContainer.querySelectorAll('[data-aos]').forEach(el => {
@@ -599,12 +480,10 @@ function animateCounter(elId, target) {
     requestAnimationFrame(step);
 }
 
-
-/* ============================================================
-   INIT
-============================================================ */
 function updatePodium() {
-    const top3 = TOP_CUSTOMERS_DATA.slice(0, 3);
+    if (!topCustomersData || topCustomersData.length === 0) return;
+    
+    const top3 = topCustomersData.slice(0, 3);
     top3.forEach(c => {
         const masked = maskName(c.name);
         const nameEl = document.getElementById(`podium-name-${c.rank}`);
@@ -613,20 +492,17 @@ function updatePodium() {
         if (imgEl) {
             imgEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(masked)}&background=${c.rank === 1 ? 'FFD700' : (c.rank === 2 ? 'C0C0C0' : 'CD7F32')}&color=fff&size=${c.rank === 1 ? 100 : 80}&bold=true`;
         }
-        // Update points display on podium
-        const podiumItem = nameEl?.closest('.podium-item');
-        if (podiumItem) {
-            const pointsEl = podiumItem.querySelector('.podium-points');
-            if (pointsEl) {
-                pointsEl.innerHTML = `<i class="fas fa-star"></i> ${c.points.toLocaleString('id-ID')} Poin`;
-            }
-        }
+        
+        const locEl = nameEl ? nameEl.nextElementSibling.nextElementSibling : null;
+        if(locEl) locEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${c.city}`;
+        
+        const poinEl = nameEl ? nameEl.nextElementSibling : null;
+        if(poinEl) poinEl.innerHTML = `<i class="fas fa-star"></i> ${c.points.toLocaleString('id-ID')} Poin`;
     });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     initAOS();
     spawnParticles();
-    await populateRanking();
-    updatePodium();
+    loadTopCustomers(); // Supabase Fetch
 });
