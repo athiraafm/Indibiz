@@ -1,208 +1,25 @@
 /* ==================================================
    ADMIN DASHBOARD – admin-script.js
    Auth | Navigation | Data Management | Export
+   Connected to Supabase (PostgreSQL Cloud)
 ================================================== */
 
 /* ============================================================
-   DEFAULT CUSTOMER DATA
-   Struktur data:
-   {
-     'noInternet': {
-       name: string,
-       city: string,
-       package: string,
-       months: {
-         'Bulan Tahun': { tagihan: number, bayar: boolean, tanggalBayar: number }
-       }
-     }
-   }
-
-   Rumus poin:
-     Tagihan / 100.000 = base
-     - Tanggal 1-10  → base x 3
-     - Tanggal 11-15 → base x 2
-     - Tanggal 16-20 → base x 1
-     - Tanggal > 20 atau belum bayar → 0
-   1 Kupon = 3 Poin
+   SUPABASE CONFIG
 ============================================================ */
-
-const DEFAULT_CUSTOMERS = {
-    '1234567890': {
-        name: 'Ahmad Fauzi',
-        city: 'Banjarmasin',
-        package: 'IndiBiz High Speed 100Mbps',
-        months: {
-            'April 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 5 },
-            'Mei 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 8 },
-            'Juni 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 3 }
-        }
-    },
-    '1122334455': {
-        name: 'Budi Santoso',
-        city: 'Pontianak',
-        package: 'IndiBiz Pro 200Mbps',
-        months: {
-            'April 2025': { tagihan: 2100000, bayar: true, tanggalBayar: 2 },
-            'Mei 2025': { tagihan: 2100000, bayar: true, tanggalBayar: 10 },
-            'Juni 2025': { tagihan: 2100000, bayar: true, tanggalBayar: 6 }
-        }
-    },
-    '5544332211': {
-        name: 'Dewi Lestari',
-        city: 'Samarinda',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 750000, bayar: true, tanggalBayar: 14 },
-            'Mei 2025': { tagihan: 750000, bayar: false, tanggalBayar: 0 },
-            'Juni 2025': { tagihan: 750000, bayar: false, tanggalBayar: 0 }
-        }
-    },
-    '3344556677': {
-        name: 'Rizky Pratama',
-        city: 'Palangkaraya',
-        package: 'IndiBiz High Speed 100Mbps',
-        months: {
-            'April 2025': { tagihan: 1100000, bayar: true, tanggalBayar: 1 },
-            'Mei 2025': { tagihan: 1100000, bayar: true, tanggalBayar: 9 },
-            'Juni 2025': { tagihan: 1100000, bayar: true, tanggalBayar: 17 }
-        }
-    },
-    '5566778899': {
-        name: 'Nur Hidayah',
-        city: 'Tarakan',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 850000, bayar: true, tanggalBayar: 4 },
-            'Mei 2025': { tagihan: 850000, bayar: true, tanggalBayar: 11 },
-            'Juni 2025': { tagihan: 850000, bayar: true, tanggalBayar: 18 }
-        }
-    },
-    '4455667788': {
-        name: 'Hendra Wijaya',
-        city: 'Singkawang',
-        package: 'IndiBiz Pro 200Mbps',
-        months: {
-            'April 2025': { tagihan: 1800000, bayar: true, tanggalBayar: 3 },
-            'Mei 2025': { tagihan: 1800000, bayar: true, tanggalBayar: 15 },
-            'Juni 2025': { tagihan: 1800000, bayar: false, tanggalBayar: 0 }
-        }
-    },
-    '6677889900': {
-        name: 'Andi Saputra',
-        city: 'Bontang',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 950000, bayar: true, tanggalBayar: 6 },
-            'Mei 2025': { tagihan: 950000, bayar: true, tanggalBayar: 10 },
-            'Juni 2025': { tagihan: 950000, bayar: true, tanggalBayar: 2 }
-        }
-    },
-    '7788990011': {
-        name: 'Maya Putri',
-        city: 'Banjarbaru',
-        package: 'IndiBiz High Speed 100Mbps',
-        months: {
-            'April 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 7 },
-            'Mei 2025': { tagihan: 1250000, bayar: true, tanggalBayar: 13 },
-            'Juni 2025': { tagihan: 1250000, bayar: false, tanggalBayar: 0 }
-        }
-    },
-    '8899001122': {
-        name: 'Rahmat Hidayat',
-        city: 'Tenggarong',
-        package: 'IndiBiz Basic 50Mbps',
-        months: {
-            'April 2025': { tagihan: 650000, bayar: true, tanggalBayar: 9 },
-            'Mei 2025': { tagihan: 650000, bayar: true, tanggalBayar: 5 },
-            'Juni 2025': { tagihan: 650000, bayar: true, tanggalBayar: 19 }
-        }
-    }
-};
+const SUPABASE_URL = 'https://swqrvjtpnapvdgtxgrci.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hF0op8sFap54NyZrduW8qg_DMvXo-h8';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============================================================
-   DATA LAYER (localStorage)
+   HELPERS
 ============================================================ */
-function loadCustomers() {
-    const stored = localStorage.getItem('adminCustomers');
-    if (stored) return JSON.parse(stored);
-    // Seed with defaults
-    localStorage.setItem('adminCustomers', JSON.stringify(DEFAULT_CUSTOMERS));
-    return { ...DEFAULT_CUSTOMERS };
-}
-
-function saveCustomers(data) {
-    localStorage.setItem('adminCustomers', JSON.stringify(data));
-}
-
-function loadPeriods() {
-    const stored = localStorage.getItem('adminPeriods');
-    if (stored) return JSON.parse(stored);
-    const defaults = [
-        { name: 'Periode April – Juni 2025', start: '2025-04-01', end: '2025-06-30', active: true }
-    ];
-    localStorage.setItem('adminPeriods', JSON.stringify(defaults));
-    return defaults;
-}
-
-function savePeriods(data) {
-    localStorage.setItem('adminPeriods', JSON.stringify(data));
-}
-
-function addLog(type, action, detail) {
-    // Log kept for internal tracking but no UI
-    const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
-    logs.unshift({
-        time: new Date().toLocaleString('id-ID'),
-        type,
-        action,
-        detail
-    });
-    if (logs.length > 200) logs.length = 200;
-    localStorage.setItem('adminLogs', JSON.stringify(logs));
-}
-
-/* ============================================================
-   HELPERS – POINT CALCULATION
-   Tagihan / 100.000 = base
-   Tgl 1-10  → base x 3
-   Tgl 11-15 → base x 2
-   Tgl 16-20 → base x 1
-   Tgl > 20 / belum bayar → 0
-   1 Kupon = 3 Poin
-============================================================ */
-function getMultiplier(tanggalBayar) {
-    if (!tanggalBayar || tanggalBayar <= 0) return 0;
-    if (tanggalBayar >= 1 && tanggalBayar <= 10) return 3;
-    if (tanggalBayar >= 11 && tanggalBayar <= 15) return 2;
-    if (tanggalBayar >= 16 && tanggalBayar <= 20) return 1;
-    return 0; // >20 = no points
-}
-
-function calcPoin(tagihan, bayar, tanggalBayar) {
-    if (!bayar) return 0;
-    const base = Math.floor(tagihan / 100000);
-    const multiplier = getMultiplier(tanggalBayar || 0);
-    return base * multiplier;
-}
-
-function getTotalPoin(cust) {
-    let total = 0;
-    for (const m of Object.values(cust.months)) {
-        total += calcPoin(m.tagihan, m.bayar, m.tanggalBayar || 0);
-    }
-    return total;
-}
-
-function getTotalKupon(cust) {
-    return Math.floor(getTotalPoin(cust) / 3);
-}
-
 function formatRp(num) {
     return new Intl.NumberFormat('id-ID').format(num);
 }
 
 function censorName(name) {
-    const parts = name.split(' ');
+    const parts = (name || '').split(' ');
     return parts.map((part) => {
         if (part.endsWith('.') || part.length <= 2) return part;
         return part.charAt(0) + '***';
@@ -217,23 +34,20 @@ function getMultiplierLabel(tgl) {
     return 'x0';
 }
 
-/* Convert "April 2025" + tanggalBayar (5) → "05/04/25" */
-const MONTH_MAP = {
-    'januari': 1, 'februari': 2, 'maret': 3, 'april': 4,
-    'mei': 5, 'juni': 6, 'juli': 7, 'agustus': 8,
-    'september': 9, 'oktober': 10, 'november': 11, 'desember': 12
-};
+function calcPoin(tagihan, bayar, tanggalBayar) {
+    if (!bayar) return 0;
+    const base = Math.floor(tagihan / 100000);
+    if (tanggalBayar >= 1 && tanggalBayar <= 10) return base * 3;
+    if (tanggalBayar >= 11 && tanggalBayar <= 15) return base * 2;
+    if (tanggalBayar >= 16 && tanggalBayar <= 20) return base * 1;
+    return 0;
+}
 
-function bulanToDate(bulanStr, tanggalBayar) {
-    if (!tanggalBayar || tanggalBayar <= 0) return '-';
-    const parts = bulanStr.split(' ');
-    const monthName = parts[0].toLowerCase();
-    const year = parseInt(parts[1]) || 2025;
-    const month = MONTH_MAP[monthName] || 1;
-    const dd = String(tanggalBayar).padStart(2, '0');
-    const mm = String(month).padStart(2, '0');
-    const yy = String(year).slice(-2);
-    return `${dd}/${mm}/${yy}`;
+function addLog(type, action, detail) {
+    const logs = JSON.parse(localStorage.getItem('adminLogs') || '[]');
+    logs.unshift({ time: new Date().toLocaleString('id-ID'), type, action, detail });
+    if (logs.length > 200) logs.length = 200;
+    localStorage.setItem('adminLogs', JSON.stringify(logs));
 }
 
 /* ============================================================
@@ -292,98 +106,135 @@ document.getElementById('logoutBtn').addEventListener('click', (e) => {
    SECTION REFRESH
 ============================================================ */
 function refreshSection(sectionId) {
-    const customers = loadCustomers();
     switch (sectionId) {
-        case 'overview': renderOverview(customers); break;
-        case 'pelanggan': renderCustomerTable(customers); break;
+        case 'overview': fetchOverview(); break;
+        case 'pelanggan': fetchCustomerTable(); break;
         case 'pengaturan': renderSettings(); break;
     }
 }
 
 /* ============================================================
-   OVERVIEW
+   OVERVIEW – Fetch from Supabase
 ============================================================ */
-function renderOverview(customers) {
-    const entries = Object.entries(customers);
-    const totalCustomers = entries.length;
-    let totalPoin = 0;
-    let totalKupon = 0;
+async function fetchOverview() {
+    try {
+        // Total pelanggan
+        const { count: totalPelanggan } = await db
+            .from('data_pelanggan')
+            .select('*', { count: 'exact', head: true });
 
-    entries.forEach(([no, cust]) => {
-        const p = getTotalPoin(cust);
-        const k = getTotalKupon(cust);
-        totalPoin += p;
-        totalKupon += k;
-    });
+        // Total poin & kupon
+        const { data: poinData } = await db
+            .from('poin_dan_kupon')
+            .select('total_poin, total_kupon');
 
-    document.getElementById('statCustomers').textContent = totalCustomers.toLocaleString('id-ID');
-    document.getElementById('statPoints').textContent = totalPoin.toLocaleString('id-ID');
-    document.getElementById('statCoupons').textContent = totalKupon.toLocaleString('id-ID');
+        let totalPoin = 0;
+        let totalKupon = 0;
+        if (poinData) {
+            poinData.forEach(row => {
+                totalPoin += row.total_poin || 0;
+                totalKupon += row.total_kupon || 0;
+            });
+        }
+
+        document.getElementById('statCustomers').textContent = (totalPelanggan || 0).toLocaleString('id-ID');
+        document.getElementById('statPoints').textContent = totalPoin.toLocaleString('id-ID');
+        document.getElementById('statCoupons').textContent = totalKupon.toLocaleString('id-ID');
+    } catch (err) {
+        console.error('Gagal memuat overview:', err);
+        showToast('error', 'Gagal memuat data overview.');
+    }
 }
 
 /* ============================================================
-   DATA PELANGGAN TABLE
+   DATA PELANGGAN TABLE – Fetch from Supabase
 ============================================================ */
 let currentSearchFilter = '';
 let currentCityFilter = 'all';
 let currentSortField = 'poin';
 let currentSortDir = 'desc';
+let cachedCustomers = [];
 
-function renderCustomerTable(customers, filter = '') {
+async function fetchCustomerTable() {
+    try {
+        // Ambil semua pelanggan
+        let query = db.from('data_pelanggan').select('*');
+
+        if (currentSearchFilter) {
+            const q = `%${currentSearchFilter}%`;
+            query = query.or(`nama_pelanggan.ilike.${q},no_internet.ilike.${q},kota.ilike.${q}`);
+        }
+
+        if (currentCityFilter !== 'all') {
+            query = query.eq('kota', currentCityFilter);
+        }
+
+        const { data: pelanggan, error } = await query;
+        if (error) throw error;
+
+        // Ambil semua poin
+        const { data: poinData } = await db.from('poin_dan_kupon').select('no_internet, total_poin, total_kupon');
+        const poinMap = {};
+        if (poinData) {
+            poinData.forEach(p => {
+                if (!poinMap[p.no_internet]) {
+                    poinMap[p.no_internet] = { total_poin: 0, total_kupon: 0 };
+                }
+                poinMap[p.no_internet].total_poin += p.total_poin || 0;
+                poinMap[p.no_internet].total_kupon += p.total_kupon || 0;
+            });
+        }
+
+        // Gabungkan data
+        cachedCustomers = (pelanggan || []).map(c => ({
+            ...c,
+            total_poin: poinMap[c.no_internet]?.total_poin || 0,
+            total_kupon: poinMap[c.no_internet]?.total_kupon || 0
+        }));
+
+        renderCustomerTable(cachedCustomers);
+    } catch (err) {
+        console.error('Gagal memuat data pelanggan:', err);
+        showToast('error', 'Gagal memuat data pelanggan dari Supabase.');
+    }
+}
+
+function renderCustomerTable(customers) {
     const tbody = document.getElementById('customerTableBody');
     if (!tbody) return;
 
-    const entries = Object.entries(customers);
-    let filtered = entries;
+    let sorted = [...customers];
 
-    // Text search filter
-    if (filter) {
-        const q = filter.toLowerCase();
-        filtered = filtered.filter(([no, c]) =>
-            c.name.toLowerCase().includes(q) ||
-            no.includes(q) ||
-            c.city.toLowerCase().includes(q)
-        );
-    }
-
-    // City/Witel filter
-    if (currentCityFilter !== 'all') {
-        filtered = filtered.filter(([no, c]) =>
-            c.city.toLowerCase() === currentCityFilter.toLowerCase()
-        );
-    }
-
-    // Apply sorting
     if (currentSortField === 'poin') {
-        filtered.sort((a, b) => currentSortDir === 'desc' ? getTotalPoin(b[1]) - getTotalPoin(a[1]) : getTotalPoin(a[1]) - getTotalPoin(b[1]));
+        sorted.sort((a, b) => currentSortDir === 'desc' ? (b.total_poin || 0) - (a.total_poin || 0) : (a.total_poin || 0) - (b.total_poin || 0));
     } else if (currentSortField === 'nama') {
-        filtered.sort((a, b) => currentSortDir === 'asc' ? a[1].name.localeCompare(b[1].name) : b[1].name.localeCompare(a[1].name));
+        sorted.sort((a, b) => currentSortDir === 'asc' ? (a.nama_pelanggan || '').localeCompare(b.nama_pelanggan || '') : (b.nama_pelanggan || '').localeCompare(a.nama_pelanggan || ''));
     } else if (currentSortField === 'kota') {
-        filtered.sort((a, b) => currentSortDir === 'asc' ? a[1].city.localeCompare(b[1].city) : b[1].city.localeCompare(a[1].city));
+        sorted.sort((a, b) => currentSortDir === 'asc' ? (a.kota || '').localeCompare(b.kota || '') : (b.kota || '').localeCompare(a.kota || ''));
     } else if (currentSortField === 'kupon') {
-        filtered.sort((a, b) => currentSortDir === 'desc' ? getTotalKupon(b[1]) - getTotalKupon(a[1]) : getTotalKupon(a[1]) - getTotalKupon(b[1]));
+        sorted.sort((a, b) => currentSortDir === 'desc' ? (b.total_kupon || 0) - (a.total_kupon || 0) : (a.total_kupon || 0) - (b.total_kupon || 0));
     }
 
-    if (filtered.length === 0) {
+    if (sorted.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 30px; color: var(--text-muted);">
             <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:8px;"></i>
             Tidak ada data pelanggan ditemukan.</td></tr>`;
         return;
     }
 
-    tbody.innerHTML = filtered.map(([no, c], idx) => {
-        const poin = getTotalPoin(c);
-        const kupon = getTotalKupon(c);
+    tbody.innerHTML = sorted.map((c, idx) => {
+        const poin = c.total_poin || 0;
+        const kupon = c.total_kupon || 0;
         return `
         <tr>
             <td>${idx + 1}</td>
-            <td><strong>${c.name}</strong></td>
-            <td style="color: var(--text-secondary);">${no}</td>
-            <td>${c.city}</td>
+            <td><strong>${c.nama_pelanggan || '-'}</strong></td>
+            <td style="color: var(--text-secondary);">${c.no_internet || '-'}</td>
+            <td>${c.kota || '-'}</td>
             <td style="color: var(--accent-yellow); font-weight: 700;">${poin.toLocaleString('id-ID')}</td>
             <td><span class="badge badge-info">${kupon}</span></td>
             <td>
-                <button class="btn btn-outline btn-sm" onclick="showDetail('${no}')">
+                <button class="btn btn-outline btn-sm" onclick="showDetail('${c.no_internet}')">
                     <i class="fas fa-eye"></i>
                 </button>
             </td>
@@ -393,9 +244,11 @@ function renderCustomerTable(customers, filter = '') {
 
 const customerSearch = document.getElementById('customerSearch');
 if (customerSearch) {
+    let searchTimeout;
     customerSearch.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
         currentSearchFilter = e.target.value.trim();
-        renderCustomerTable(loadCustomers(), currentSearchFilter);
+        searchTimeout = setTimeout(() => fetchCustomerTable(), 300);
     });
 }
 
@@ -403,7 +256,7 @@ const customerCityFilter = document.getElementById('customerCityFilter');
 if (customerCityFilter) {
     customerCityFilter.addEventListener('change', (e) => {
         currentCityFilter = e.target.value;
-        renderCustomerTable(loadCustomers(), currentSearchFilter);
+        fetchCustomerTable();
     });
 }
 
@@ -414,118 +267,116 @@ function sortCustomerTable(field) {
         currentSortField = field;
         currentSortDir = (field === 'nama' || field === 'kota') ? 'asc' : 'desc';
     }
-    renderCustomerTable(loadCustomers(), currentSearchFilter);
+    renderCustomerTable(cachedCustomers);
 }
 
 /* ============================================================
-   DETAIL PELANGGAN MODAL
+   DETAIL PELANGGAN MODAL – Fetch from Supabase
 ============================================================ */
-function showDetail(no) {
-    const customers = loadCustomers();
-    const cust = customers[no];
-    if (!cust) return;
+async function showDetail(no) {
+    try {
+        // Ambil data pelanggan
+        const { data: pelanggan, error: errP } = await db
+            .from('data_pelanggan')
+            .select('*')
+            .eq('no_internet', no)
+            .single();
 
-    document.getElementById('detailModalTitle').textContent = `Detail: ${cust.name}`;
-    document.getElementById('detailName').textContent = cust.name;
-    document.getElementById('detailNo').textContent = no;
-    document.getElementById('detailCity').textContent = cust.city;
-    document.getElementById('detailPackage').textContent = cust.package;
+        if (errP || !pelanggan) {
+            showToast('error', 'Pelanggan tidak ditemukan.');
+            return;
+        }
 
-    const tbody = document.getElementById('detailPointsBody');
-    let totalPoin = 0;
-    tbody.innerHTML = '';
+        // Ambil histori pembayaran
+        const { data: pembayaran } = await db
+            .from('informasi_pembayaran')
+            .select('*')
+            .eq('no_internet', no)
+            .order('periode_tagihan');
 
-    Object.entries(cust.months).forEach(([bulan, data]) => {
-        const tgl = data.tanggalBayar || 0;
-        const poin = calcPoin(data.tagihan, data.bayar, tgl);
-        totalPoin += poin;
-        const badgeClass = data.bayar ? 'badge-success' : 'badge-danger';
-        const badgeText = data.bayar ? 'Lunas' : 'Belum Bayar';
-        const poinColor = poin > 0 ? 'var(--accent-yellow)' : 'var(--accent-red)';
-        const base = Math.floor(data.tagihan / 100000);
-        const mult = getMultiplierLabel(tgl);
+        // Ambil poin
+        const { data: poinData } = await db
+            .from('poin_dan_kupon')
+            .select('*')
+            .eq('no_internet', no);
 
-        tbody.innerHTML += `
-        <tr>
-            <td>${bulan}</td>
-            <td>Rp ${formatRp(data.tagihan)}</td>
-            <td><span class="badge ${badgeClass}">${badgeText}</span></td>
-            <td style="color: var(--text-secondary);">${bulanToDate(bulan, tgl)}</td>
-            <td style="color: var(--text-secondary);">${data.bayar ? base + ' ' + mult : '-'}</td>
-            <td style="font-weight: 700; color: ${poinColor};">${poin > 0 ? '+' : ''}${poin}</td>
-        </tr>`;
-    });
+        document.getElementById('detailModalTitle').textContent = `Detail: ${pelanggan.nama_pelanggan}`;
+        document.getElementById('detailName').textContent = pelanggan.nama_pelanggan;
+        document.getElementById('detailNo').textContent = pelanggan.no_internet;
+        document.getElementById('detailCity').textContent = pelanggan.kota || '-';
+        document.getElementById('detailPackage').textContent = pelanggan.paket || '-';
 
-    document.getElementById('detailTotalPoin').textContent = `${totalPoin.toLocaleString('id-ID')} Poin (${getTotalKupon(cust)} Kupon)`;
+        const tbody = document.getElementById('detailPointsBody');
+        let totalPoin = 0;
+        tbody.innerHTML = '';
 
-    openModal('detailModal');
+        (pembayaran || []).forEach((pay) => {
+            const tglBayar = pay.tanggal_bayar ? new Date(pay.tanggal_bayar).getDate() : 0;
+            const tagihan = pelanggan.nominal_tagihan || 0;
+            const isLunas = pay.status_lunas;
+            const poin = calcPoin(tagihan, isLunas, tglBayar);
+            totalPoin += poin;
+
+            const badgeClass = isLunas ? 'badge-success' : 'badge-danger';
+            const badgeText = isLunas ? 'Lunas' : 'Belum Bayar';
+            const poinColor = poin > 0 ? 'var(--accent-yellow)' : 'var(--accent-red)';
+            const base = Math.floor(tagihan / 100000);
+            const mult = getMultiplierLabel(tglBayar);
+            const tglFormatted = pay.tanggal_bayar ? new Date(pay.tanggal_bayar).toLocaleDateString('id-ID') : '-';
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${pay.periode_tagihan || '-'}</td>
+                <td>Rp ${formatRp(tagihan)}</td>
+                <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                <td style="color: var(--text-secondary);">${tglFormatted}</td>
+                <td style="color: var(--text-secondary);">${isLunas ? base + ' ' + mult : '-'}</td>
+                <td style="font-weight: 700; color: ${poinColor};">${poin > 0 ? '+' : ''}${poin}</td>
+            </tr>`;
+        });
+
+        const totalKupon = poinData && poinData.length > 0 ? (poinData[0].total_kupon || 0) : Math.floor(totalPoin / 3);
+        const displayPoin = poinData && poinData.length > 0 ? (poinData[0].total_poin || totalPoin) : totalPoin;
+        document.getElementById('detailTotalPoin').textContent = `${displayPoin.toLocaleString('id-ID')} Poin (${totalKupon} Kupon)`;
+
+        openModal('detailModal');
+    } catch (err) {
+        console.error('Gagal memuat detail:', err);
+        showToast('error', 'Gagal memuat detail pelanggan.');
+    }
 }
 
 /* ============================================================
    EXPORT TO EXCEL
 ============================================================ */
 function exportToExcel(type) {
-    const customers = loadCustomers();
-
+    const customers = cachedCustomers;
     let data = [];
     let filename = '';
 
     if (type === 'full') {
-        const entries = Object.entries(customers)
-            .map(([no, c]) => ({
-                no, ...c,
-                totalPoin: getTotalPoin(c),
-                totalKupon: getTotalKupon(c)
-            }))
-            .sort((a, b) => b.totalPoin - a.totalPoin);
-
-        // Apply city filter if active
-        const filtered = currentCityFilter === 'all' ? entries :
-            entries.filter(c => c.city.toLowerCase() === currentCityFilter.toLowerCase());
-
-        data = filtered.map((c, idx) => {
-            const row = {
-                'No': idx + 1,
-                'Nama Customer': c.name,
-                'No Internet': c.no,
-                'Kota': c.city,
-                'Paket': c.package,
-                'Total Poin': c.totalPoin,
-                'Total Kupon': c.totalKupon
-            };
-            Object.entries(c.months).forEach(([bulan, m]) => {
-                row[`${bulan} - Tagihan`] = m.tagihan;
-                row[`${bulan} - Tgl Bayar`] = m.tanggalBayar || 0;
-                row[`${bulan} - Status`] = m.bayar ? 'Lunas' : 'Belum Bayar';
-                row[`${bulan} - Poin`] = calcPoin(m.tagihan, m.bayar, m.tanggalBayar || 0);
-            });
-            return row;
-        });
-
-        filename = `Laporan_Pelanggan_IndiBiz_${new Date().toISOString().split('T')[0]}.xlsx`;
-
-    } else if (type === 'ranking') {
-        const entries = Object.entries(customers)
-            .map(([no, c]) => ({
-                no, name: c.name, city: c.city,
-                poin: getTotalPoin(c), kupon: getTotalKupon(c)
-            }))
-            .sort((a, b) => b.poin - a.poin);
-
-        // Apply city filter if active
-        const filtered = currentCityFilter === 'all' ? entries :
-            entries.filter(c => c.city.toLowerCase() === currentCityFilter.toLowerCase());
-
-        data = filtered.map((c, idx) => ({
-            'Rank': idx + 1,
-            'Nama Customer': c.name,
-            'Nama Sensor': censorName(c.name),
-            'No Internet': c.no,
-            'Kota': c.city,
-            'Total Poin': c.poin,
-            'Total Kupon': c.kupon
+        data = customers.map((c, idx) => ({
+            'No': idx + 1,
+            'Nama Customer': c.nama_pelanggan,
+            'No Internet': c.no_internet,
+            'Kota': c.kota,
+            'Witel': c.witel || '',
+            'Paket': c.paket || '',
+            'Total Poin': c.total_poin || 0,
+            'Total Kupon': c.total_kupon || 0
         }));
-
+        filename = `Laporan_Pelanggan_IndiBiz_${new Date().toISOString().split('T')[0]}.xlsx`;
+    } else if (type === 'ranking') {
+        const sorted = [...customers].sort((a, b) => (b.total_poin || 0) - (a.total_poin || 0));
+        data = sorted.map((c, idx) => ({
+            'Rank': idx + 1,
+            'Nama Customer': c.nama_pelanggan,
+            'Nama Sensor': censorName(c.nama_pelanggan || ''),
+            'No Internet': c.no_internet,
+            'Kota': c.kota,
+            'Total Poin': c.total_poin || 0,
+            'Total Kupon': c.total_kupon || 0
+        }));
         filename = `Top_Customer_IndiBiz_${new Date().toISOString().split('T')[0]}.xlsx`;
     }
 
@@ -541,7 +392,6 @@ function exportToExcel(type) {
 
     addLog('export', `Export ${type === 'full' ? 'Data Pelanggan' : 'Top Customer'}`,
         `Berhasil meng-export ${data.length} baris data ke file ${filename}`);
-
     showToast('success', `File "${filename}" berhasil diunduh!`);
 }
 
@@ -565,7 +415,6 @@ function changePassword() {
         return;
     }
 
-    // Load saved credentials or use defaults
     const savedCreds = JSON.parse(localStorage.getItem('adminCredentials') || 'null');
     const actualPassword = savedCreds ? savedCreds.password : 'admin123';
 
@@ -598,6 +447,20 @@ function changePassword() {
 /* ============================================================
    SETTINGS – PERIOD MANAGEMENT
 ============================================================ */
+function loadPeriods() {
+    const stored = localStorage.getItem('adminPeriods');
+    if (stored) return JSON.parse(stored);
+    const defaults = [
+        { name: 'Periode April – Juni 2025', start: '2025-04-01', end: '2025-06-30', active: true }
+    ];
+    localStorage.setItem('adminPeriods', JSON.stringify(defaults));
+    return defaults;
+}
+
+function savePeriods(data) {
+    localStorage.setItem('adminPeriods', JSON.stringify(data));
+}
+
 function renderPeriodList() {
     const container = document.getElementById('periodList');
     if (!container) return;
@@ -711,22 +574,7 @@ function showToast(type, message) {
    INIT
 ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    // Reset mock data if format is old
-    const stored = localStorage.getItem('adminCustomers');
-    if (stored) {
-        const data = JSON.parse(stored);
-        const firstKey = Object.keys(data)[0];
-        if (firstKey) {
-            const firstMonth = Object.values(data[firstKey].months)[0];
-            const hasOldFormat = firstMonth && firstMonth.tanggalBayar === undefined;
-            const hasOldNames = data[firstKey].name && (data[firstKey].name.startsWith('CV.') || data[firstKey].name.startsWith('PT.') || data[firstKey].name.startsWith('UD.') || data[firstKey].name.startsWith('Toko '));
-            if (hasOldFormat || hasOldNames) {
-                localStorage.setItem('adminCustomers', JSON.stringify(DEFAULT_CUSTOMERS));
-            }
-        }
-    }
-
-    renderOverview(loadCustomers());
+    fetchOverview();
 
     // Realtime clock
     function updateClock() {

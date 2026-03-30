@@ -1,13 +1,18 @@
-/* ==================================================
-   PENGUNDIAN PAGE – script.js
-   Slot machine animation, confetti, winner reveal
-   Sound effects via Web Audio API
-================================================== */
+/* ============================================================
+   SUPABASE CONFIG
+============================================================ */
+const SUPABASE_URL = 'https://swqrvjtpnapvdgtxgrci.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hF0op8sFap54NyZrduW8qg_DMvXo-h8';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============================================================
-   SAMPLE KUPON DATA (In production, load from admin data)
+   KUPON DATA (loaded from Supabase, fallback to sample)
 ============================================================ */
-const KUPON_DATA = [
+let KUPON_DATA = [];
+let dataLoaded = false;
+
+// Sample data sebagai fallback jika database kosong
+const SAMPLE_KUPON_DATA = [
     { noInternet: '1234567890', name: 'Ahmad Fauzi', city: 'Banjarmasin', kupon: 37 },
     { noInternet: '1122334455', name: 'Budi Santoso', city: 'Pontianak', kupon: 63 },
     { noInternet: '3344556677', name: 'Rizky Pratama', city: 'Palangkaraya', kupon: 33 },
@@ -17,6 +22,58 @@ const KUPON_DATA = [
     { noInternet: '0987654321', name: 'Siti Rahmawati', city: 'Balikpapan', kupon: 15 },
     { noInternet: '7788990011', name: 'Maya Putri', city: 'Banjarbaru', kupon: 25 },
 ];
+
+async function loadKuponFromSupabase() {
+    try {
+        // Ambil data pelanggan yang punya kupon > 0
+        const { data: poinData, error: errPoin } = await db
+            .from('poin_dan_kupon')
+            .select('no_internet, total_kupon')
+            .gt('total_kupon', 0);
+
+        if (errPoin) throw errPoin;
+
+        if (!poinData || poinData.length === 0) {
+            console.log('Database kosong, menggunakan data sampel.');
+            KUPON_DATA = SAMPLE_KUPON_DATA;
+            dataLoaded = true;
+            return;
+        }
+
+        // Ambil data nama & kota pelanggan
+        const noInternetList = poinData.map(p => p.no_internet);
+        const { data: pelangganData, error: errPelanggan } = await db
+            .from('data_pelanggan')
+            .select('no_internet, nama_pelanggan, kota')
+            .in('no_internet', noInternetList);
+
+        if (errPelanggan) throw errPelanggan;
+
+        // Buat map pelanggan
+        const pelangganMap = {};
+        (pelangganData || []).forEach(p => {
+            pelangganMap[p.no_internet] = p;
+        });
+
+        // Gabungkan jadi format KUPON_DATA
+        KUPON_DATA = poinData.map(p => ({
+            noInternet: p.no_internet,
+            name: pelangganMap[p.no_internet]?.nama_pelanggan || '-',
+            city: pelangganMap[p.no_internet]?.kota || '-',
+            kupon: p.total_kupon || 0
+        }));
+
+        console.log(`Berhasil memuat ${KUPON_DATA.length} peserta undian dari Supabase.`);
+        dataLoaded = true;
+    } catch (err) {
+        console.error('Gagal memuat data dari Supabase:', err);
+        KUPON_DATA = SAMPLE_KUPON_DATA;
+        dataLoaded = true;
+    }
+}
+
+// Load data saat halaman dimuat
+loadKuponFromSupabase();
 
 const DIGITS = '0123456789';
 const NUM_REELS = 10; // 10-digit internet number
@@ -169,9 +226,9 @@ function playCelebrationSound() {
 function createParticles() {
     const container = document.getElementById('particles');
     const colors = ['#1d4ed8', '#7c3aed', '#db2777', '#d97706', '#0891b2', '#059669', '#f59e0b', '#ec4899'];
-    const shapes = ['circle', 'square', 'diamond', 'star'];
+    const shapes = ['circle', 'square', 'diamond'];
 
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 250; i++) {
         const particle = document.createElement('div');
         const shape = shapes[Math.floor(Math.random() * shapes.length)];
         particle.className = `particle particle-${shape}`;
@@ -192,17 +249,12 @@ function createParticles() {
         if (shape === 'diamond') {
             particle.style.transform = 'rotate(45deg)';
         }
-        if (shape === 'star') {
-            particle.innerHTML = '<i class="fas fa-star" style="font-size:' + size + 'px; color:' + color + ';"></i>';
-            particle.style.background = 'none';
-            particle.style.boxShadow = 'none';
-        }
 
         container.appendChild(particle);
     }
 
     // Add ribbon-like particles
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 60; i++) {
         const ribbon = document.createElement('div');
         ribbon.className = 'particle particle-ribbon';
         const color = colors[Math.floor(Math.random() * colors.length)];
@@ -453,6 +505,11 @@ function validateWinner() {
     btn.disabled = true;
     btn.style.cursor = 'not-allowed';
 
+    // Simpan pemenang ke Supabase
+    if (selectedWinner) {
+        saveWinnerToSupabase(selectedWinner);
+    }
+
     // Re-launch confetti celebration  
     launchConfetti();
     playCelebrationSound();
@@ -509,5 +566,24 @@ function finishLottery() {
         const canvas = document.getElementById('confettiCanvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+/* ============================================================
+   SAVE WINNER TO SUPABASE
+============================================================ */
+async function saveWinnerToSupabase(winner) {
+    try {
+        const { error } = await db.from('winner').insert({
+            no_internet: winner.noInternet,
+            nama_pemenang: winner.name,
+            kota_pemenang: winner.city,
+            jenis_hadiah: 'Honda PCX 160',
+        });
+
+        if (error) throw error;
+        console.log('Pemenang berhasil disimpan ke Supabase!');
+    } catch (err) {
+        console.error('Gagal menyimpan pemenang:', err);
     }
 }

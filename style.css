@@ -15,7 +15,7 @@ html {
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 30%, #f1f5f9 60%, #f8fafc 100%);
     color: #1e293b;
     overflow-x: hidden;
@@ -199,12 +199,7 @@ body {
 .title-line1 {
     font-size: 2.0rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #1d4ed8, #7c3aed, #db2777, #d97706);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift 4s ease infinite;
+    color: #1e3a8a;
     letter-spacing: 2px;
 }
 
@@ -723,11 +718,11 @@ body {
     align-items: center;
     gap: 14px;
     padding: 18px 60px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.4rem;
     font-weight: 800;
     color: #ffffff;
-    background: linear-gradient(135deg, #1d4ed8, #6366f1, #7c3aed);
+    background: #1d4ed8;
     border: none;
     border-radius: 16px;
     cursor: pointer;
