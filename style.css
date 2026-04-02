@@ -577,21 +577,7 @@ ul {
     color: var(--blue-600);
 }
 
-.info-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--blue-500), var(--cyan));
-    opacity: 0;
-    transition: var(--transition);
-}
 
-.info-card:hover::before {
-    opacity: 1;
-}
 
 .card-icon-wrap {
     position: relative;
@@ -1737,7 +1723,11 @@ ul {
 }
 
 .loading-text {
-    margin-top: 60px;
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--blue-500);

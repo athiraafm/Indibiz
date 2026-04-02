@@ -406,6 +406,7 @@ async function doCekPoin() {
         emptyState.style.display = 'block';
         document.getElementById('emptyMessage').textContent =
             `Nomor internet "${no}" tidak terdaftar dalam sistem kami. Pastikan nomor yang Anda masukkan benar.`;
+        emptyState.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
